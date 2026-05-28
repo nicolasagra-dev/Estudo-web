@@ -1,0 +1,205 @@
+.agendamento-page {
+  min-height: 100vh;
+  background: #f7f8fb;
+  color: #111827;
+  padding: 32px;
+}
+
+.agendamento-header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin: 0 auto 24px;
+  max-width: 1180px;
+}
+
+.agendamento-kicker {
+  color: #0f766e;
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.agendamento-header h1 {
+  font-size: 2rem;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.agendamento-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(300px, 390px) minmax(0, 1fr);
+  margin: 0 auto;
+  max-width: 1180px;
+}
+
+.agendamento-form,
+.agendamento-list {
+  background: #ffffff;
+  border: 1px solid #d8dee9;
+  border-radius: 8px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+}
+
+.agendamento-form {
+  align-self: start;
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+}
+
+.agendamento-form label {
+  color: #374151;
+  display: grid;
+  font-size: 0.9rem;
+  font-weight: 700;
+  gap: 7px;
+}
+
+.agendamento-form input {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  color: #111827;
+  font: inherit;
+  min-height: 42px;
+  padding: 8px 10px;
+  width: 100%;
+}
+
+.agendamento-form input:focus {
+  border-color: #0f766e;
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.16);
+  outline: none;
+}
+
+.agendamento-inline {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.agendamento-primary,
+.agendamento-list-header button,
+.agendamento-danger {
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  min-height: 38px;
+  padding: 8px 12px;
+}
+
+.agendamento-primary {
+  background: #0f766e;
+  color: #ffffff;
+}
+
+.agendamento-primary:disabled,
+.agendamento-list-header button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.agendamento-list {
+  overflow: hidden;
+}
+
+.agendamento-list-header {
+  align-items: center;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 18px 20px;
+}
+
+.agendamento-list-header h2 {
+  font-size: 1.05rem;
+  margin: 0;
+}
+
+.agendamento-list-header button {
+  background: #e8f3f1;
+  color: #115e59;
+}
+
+.agendamento-table-wrap {
+  overflow-x: auto;
+}
+
+.agendamento-list table {
+  border-collapse: collapse;
+  min-width: 760px;
+  width: 100%;
+}
+
+.agendamento-list th,
+.agendamento-list td {
+  border-bottom: 1px solid #edf0f5;
+  font-size: 0.92rem;
+  padding: 13px 16px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.agendamento-list th {
+  background: #fbfcfe;
+  color: #4b5563;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
+.agendamento-danger {
+  background: #fee2e2;
+  color: #991b1b;
+  min-height: 34px;
+}
+
+.agendamento-alert {
+  border-radius: 6px;
+  font-size: 0.9rem;
+  margin: 0;
+  padding: 10px 12px;
+}
+
+.agendamento-alert.error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.agendamento-alert.success {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.agendamento-empty {
+  color: #6b7280;
+  margin: 0;
+  padding: 20px;
+}
+
+@media (max-width: 860px) {
+  .agendamento-page {
+    padding: 20px;
+  }
+
+  .agendamento-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .agendamento-header h1 {
+    font-size: 1.55rem;
+  }
+
+  .agendamento-inline {
+    grid-template-columns: 1fr;
+  }
+}
