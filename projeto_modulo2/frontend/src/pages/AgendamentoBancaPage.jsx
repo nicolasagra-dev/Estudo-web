@@ -129,7 +129,7 @@ export default function AgendamentoBancaPage() {
       <header className="ifam-header">
         <div className="ifam-header-top">
           <div className="ifam-logo-container">
-            <svg viewBox="0 0 280 105" width="200" height="75" className="ifam-logo-svg">
+            <svg viewBox="0 0 310 105" width="220" height="75" className="ifam-logo-svg">
               <g transform="translate(5, 5)">
                 {/* Coluna 1 (i) */}
                 {/* Círculo vermelho: dimensão 10% maior que o quadrado x (20px). Logo, diâmetro=22, raio=11. Centrado em cx=10, cy=10 */}
@@ -150,11 +150,11 @@ export default function AgendamentoBancaPage() {
                 <rect x="48" y="48" width="20" height="20" fill="#2f9e41" rx="2" />
               </g>
               {/* O texto começa após 50% de x (10px) do fim do símbolo (68px + 10px = 78px) */}
-              {/* O manual de uso da marca oficializa a família Open Sans em peso Bold para a assinatura da marca e Regular para o Campus */}
-              <g transform="translate(78, 18)">
-                <text x="0" y="18" fontFamily="'Open Sans', sans-serif" fontSize="18" fontWeight="800" fill="#000000" letterSpacing="-0.02em">INSTITUTO</text>
-                <text x="0" y="36" fontFamily="'Open Sans', sans-serif" fontSize="18" fontWeight="800" fill="#000000" letterSpacing="-0.02em">FEDERAL</text>
-                <text x="0" y="58" fontFamily="'Open Sans', sans-serif" fontSize="14" fontWeight="400" fill="#000000">Amazonas</text>
+              {/* Assinatura institucional de campus (Página 7): INSTITUTO FEDERAL, Amazonas e Campus Manaus Zona Leste */}
+              <g transform="translate(78, 12)">
+                <text x="0" y="18" fontFamily="'Open Sans', sans-serif" fontSize="16" fontWeight="800" fill="#000000" letterSpacing="-0.02em">INSTITUTO FEDERAL</text>
+                <text x="0" y="38" fontFamily="'Open Sans', sans-serif" fontSize="13" fontWeight="600" fill="#000000">Amazonas</text>
+                <text x="0" y="58" fontFamily="'Open Sans', sans-serif" fontSize="11" fontWeight="400" fill="#5c6b7d">Campus Manaus Zona Leste</text>
               </g>
             </svg>
           </div>
