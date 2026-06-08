@@ -129,7 +129,7 @@ export default function AgendamentoBancaPage() {
       <header className="ifam-header">
         <div className="ifam-header-top">
           <div className="ifam-logo-container">
-            <svg viewBox="0 0 310 105" width="220" height="75" className="ifam-logo-svg">
+            <svg viewBox="0 0 280 105" width="200" height="75" className="ifam-logo-svg">
               <g transform="translate(5, 5)">
                 {/* Coluna 1 (i) */}
                 {/* Círculo vermelho: dimensão 10% maior que o quadrado x (20px). Logo, diâmetro=22, raio=11. Centrado em cx=10, cy=10 */}
@@ -138,19 +138,20 @@ export default function AgendamentoBancaPage() {
                 <rect x="0" y="48" width="20" height="20" fill="#2f9e41" rx="2" />
                 <rect x="0" y="72" width="20" height="20" fill="#2f9e41" rx="2" />
                 
-                {/* Coluna 3 (f) - Posição x = 48 (Col 1 + gap + Col 2 + gap = 20 + 4 + 20 + 4 = 48) */}
-                <rect x="48" y="0" width="20" height="20" fill="#2f9e41" rx="2" />
-                <rect x="48" y="24" width="20" height="20" fill="#2f9e41" rx="2" />
-                <rect x="48" y="48" width="20" height="20" fill="#2f9e41" rx="2" />
-                <rect x="48" y="72" width="20" height="20" fill="#2f9e41" rx="2" />
+                {/* Coluna 2 (f-haste) - Posição x = 24 (Col 1 + gap = 20 + 4 = 24) */}
+                <rect x="24" y="0" width="20" height="20" fill="#2f9e41" rx="2" />
+                <rect x="24" y="24" width="20" height="20" fill="#2f9e41" rx="2" />
+                <rect x="24" y="48" width="20" height="20" fill="#2f9e41" rx="2" />
+                <rect x="24" y="72" width="20" height="20" fill="#2f9e41" rx="2" />
                 
-                {/* Coluna 4 (f - barras) - Posição x = 72 (Col 3 + gap = 48 + 4 = 52) */}
-                <rect x="72" y="0" width="20" height="20" fill="#2f9e41" rx="2" />
-                <rect x="72" y="24" width="20" height="20" fill="#2f9e41" rx="2" />
+                {/* Coluna 3 (f-barras) - Posição x = 48 (Col 2 + gap = 24 + 4 + 20 = 48) */}
+                {/* O manual de marca mostra a barra de cima na linha 1 (y=0) e a do meio na linha 3 (y=48) */}
+                <rect x="48" y="0" width="20" height="20" fill="#2f9e41" rx="2" />
+                <rect x="48" y="48" width="20" height="20" fill="#2f9e41" rx="2" />
               </g>
-              {/* O texto começa após 50% de x (10px) do fim do símbolo (92px + 10px = 102px) */}
+              {/* O texto começa após 50% de x (10px) do fim do símbolo (68px + 10px = 78px) */}
               {/* O manual de uso da marca oficializa a família Open Sans em peso Bold para a assinatura da marca e Regular para o Campus */}
-              <g transform="translate(102, 18)">
+              <g transform="translate(78, 18)">
                 <text x="0" y="18" fontFamily="'Open Sans', sans-serif" fontSize="18" fontWeight="800" fill="#000000" letterSpacing="-0.02em">INSTITUTO</text>
                 <text x="0" y="36" fontFamily="'Open Sans', sans-serif" fontSize="18" fontWeight="800" fill="#000000" letterSpacing="-0.02em">FEDERAL</text>
                 <text x="0" y="58" fontFamily="'Open Sans', sans-serif" fontSize="14" fontWeight="400" fill="#000000">Amazonas</text>
@@ -189,7 +190,7 @@ export default function AgendamentoBancaPage() {
       {/* Conteúdo Principal */}
       <main className="agendamento-shell">
         <header className="agendamento-header">
-          <span className="agendamento-kicker">RF-19</span>
+          <span className="agendamento-kicker">RF19</span>
           <h1>Agendamento de Bancas</h1>
           <p className="agendamento-subtitle">
             Gestão acadêmica de defesas — cadastre horários, local ou link e acompanhe as
