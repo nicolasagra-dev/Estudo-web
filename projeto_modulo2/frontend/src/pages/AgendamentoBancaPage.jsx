@@ -190,7 +190,6 @@ export default function AgendamentoBancaPage() {
       {/* Conteúdo Principal */}
       <main className="agendamento-shell">
         <header className="agendamento-header">
-          <span className="agendamento-kicker">RF19</span>
           <h1>Agendamento de Bancas</h1>
           <p className="agendamento-subtitle">
             Gestão acadêmica de defesas — cadastre horários, local ou link e acompanhe as
