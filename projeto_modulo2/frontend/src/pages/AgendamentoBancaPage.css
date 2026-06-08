@@ -1,203 +1,619 @@
 .agendamento-page {
+  --cor-verde-marca: #2f9e41; /* Verde oficial IF */
+  --cor-vermelho-marca: #cd191e; /* Vermelho oficial IF */
+  --verde-principal: #135846; /* Verde institucional escuro */
+  --verde-hover: #0c4335;
+  --verde-claro: #eef7f4;
+  --verde-focus: rgba(47, 158, 65, 0.15);
+  --fundo: #f4f6f8;
+  --branco: #ffffff;
+  --texto-principal: #1c2a38;
+  --texto-secundario: #5c6b7d;
+  --borda: #d2dbd7;
+  --borda-suave: #e6ece9;
+  --vermelho-suave: #cd191e;
+  --vermelho-claro: #fdf2f2;
+  --sombra-card: 0 4px 12px rgba(0, 0, 0, 0.03), 0 8px 24px rgba(0, 0, 0, 0.05);
+  --sombra-botao: 0 4px 12px rgba(19, 88, 70, 0.15);
+  --raio-card: 12px;
+  --raio-input: 8px;
+  --raio-botao: 8px;
+  --transicao: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  position: relative;
   min-height: 100vh;
-  background: #f7f8fb;
-  color: #111827;
-  padding: 32px;
+  padding: 0 0 64px;
+  background: var(--fundo);
+  color: var(--texto-principal);
+  font-family: 'Inter', sans-serif;
+}
+
+/* --- CABEÇALHO INSTITUCIONAL IFAM --- */
+.ifam-header {
+  background: var(--branco);
+  border-bottom: 3px solid var(--cor-verde-marca);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.ifam-header-top {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.ifam-logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.ifam-logo-svg {
+  display: block;
+}
+
+.ifam-system-title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+}
+
+.ifam-badge {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--verde-principal);
+  background: var(--verde-claro);
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-bottom: 6px;
+  border: 1px solid rgba(47, 158, 65, 0.18);
+}
+
+.ifam-system-title h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--texto-principal);
+  letter-spacing: -0.01em;
+}
+
+.ifam-nav {
+  background: var(--verde-principal);
+}
+
+.ifam-nav-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 40px;
+  display: flex;
+  gap: 4px;
+}
+
+.ifam-nav-link {
+  display: block;
+  padding: 14px 20px;
+  color: var(--branco);
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 600;
+  transition: background-color var(--transicao);
+  border-bottom: 3px solid transparent;
+}
+
+.ifam-nav-link:hover {
+  background: var(--verde-hover);
+}
+
+.ifam-nav-link.active {
+  background: var(--verde-hover);
+  border-bottom-color: var(--cor-verde-marca);
+}
+
+/* --- BREADCRUMBS --- */
+.ifam-breadcrumbs-container {
+  background: #fdfdfd;
+  border-bottom: 1px solid var(--borda-suave);
+}
+
+.ifam-breadcrumbs {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 10px 40px;
+  font-size: 0.78rem;
+  color: var(--texto-secundario);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.label-voce {
+  font-weight: 600;
+  margin-right: 6px;
+  color: #8a99a8;
+}
+
+.crumb-link {
+  color: var(--verde-principal);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color var(--transicao);
+}
+
+.crumb-link:hover {
+  color: var(--cor-verde-marca);
+  text-decoration: underline;
+}
+
+.separator {
+  margin: 0 8px;
+  color: #cbd5e1;
+  font-weight: 400;
+}
+
+.current {
+  color: var(--texto-principal);
+  font-weight: 600;
+}
+
+/* --- CONTEÚDO PRINCIPAL / SHELL --- */
+.agendamento-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 40px 48px;
 }
 
 .agendamento-header {
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
-  margin: 0 auto 24px;
-  max-width: 1180px;
+  margin-bottom: 32px;
+  padding: 24px 28px;
+  background: var(--branco);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-card);
+  box-shadow: var(--sombra-card);
+  border-left: 5px solid var(--cor-verde-marca);
 }
 
 .agendamento-kicker {
-  color: #0f766e;
-  display: block;
-  font-size: 0.78rem;
+  display: inline-block;
+  margin-bottom: 8px;
+  color: var(--verde-principal);
+  background: var(--verde-claro);
+  font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0;
-  margin-bottom: 6px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(47, 158, 65, 0.12);
 }
 
 .agendamento-header h1 {
-  font-size: 2rem;
-  line-height: 1.2;
-  margin: 0;
+  margin: 0 0 6px;
+  font-size: 1.7rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--texto-principal);
+  letter-spacing: -0.02em;
 }
 
+.agendamento-subtitle {
+  margin: 0;
+  color: var(--texto-secundario);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+/* --- GRID DE AGENDAMENTO --- */
 .agendamento-grid {
   display: grid;
-  gap: 20px;
-  grid-template-columns: minmax(300px, 390px) minmax(0, 1fr);
-  margin: 0 auto;
-  max-width: 1180px;
+  grid-template-columns: minmax(0, 390px) minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
 }
 
+/* CARDS */
 .agendamento-form,
 .agendamento-list {
-  background: #ffffff;
-  border: 1px solid #d8dee9;
-  border-radius: 8px;
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+  min-width: 0;
+  background: var(--branco);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-card);
+  box-shadow: var(--sombra-card);
+  overflow: hidden;
 }
 
+/* FORMULÁRIO */
 .agendamento-form {
-  align-self: start;
   display: grid;
   gap: 16px;
-  padding: 20px;
+  padding: 0;
+}
+
+.agendamento-form-head {
+  padding: 20px 24px 0;
+  border-bottom: 1px solid var(--borda-suave);
+  margin-bottom: 4px;
+}
+
+.agendamento-form-head h2 {
+  margin: 0 0 4px;
+  color: var(--texto-principal);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.agendamento-form-head p {
+  margin: 0 0 16px;
+  color: var(--texto-secundario);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.agendamento-form-fields {
+  display: grid;
+  gap: 18px;
+  padding: 4px 24px 24px;
 }
 
 .agendamento-form label {
-  color: #374151;
   display: grid;
-  font-size: 0.9rem;
-  font-weight: 700;
-  gap: 7px;
+  gap: 6px;
+  min-width: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--texto-principal);
 }
 
 .agendamento-form input {
-  background: #ffffff;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  color: #111827;
-  min-height: 42px;
-  padding: 8px 10px;
+  display: block;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  height: 46px;
+  padding: 0 14px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-input);
+  background: #fafbfc;
+  color: var(--texto-principal);
+  font-size: 0.9rem;
+  transition: border-color var(--transicao), box-shadow var(--transicao), background-color var(--transicao);
+}
+
+.agendamento-form input::placeholder {
+  color: #a0aec0;
+}
+
+.agendamento-form input:hover:not(:focus) {
+  border-color: #cbd5e1;
+  background: var(--branco);
 }
 
 .agendamento-form input:focus {
-  border-color: #0f766e;
-  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.16);
+  border-color: var(--cor-verde-marca);
+  background: var(--branco);
   outline: none;
+  box-shadow: 0 0 0 3px var(--verde-focus);
 }
 
 .agendamento-inline {
   display: grid;
-  gap: 12px;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  min-width: 0;
 }
 
+/* BOTÕES */
 .agendamento-primary,
 .agendamento-list-header button,
 .agendamento-danger {
-  border: 0;
-  border-radius: 6px;
+  border: none;
+  border-radius: var(--raio-botao);
   cursor: pointer;
-  font-weight: 700;
-  min-height: 38px;
-  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  transition: background-color var(--transicao), border-color var(--transicao), color var(--transicao), transform var(--transicao), box-shadow var(--transicao);
 }
 
 .agendamento-primary {
-  background: #0f766e;
-  color: #ffffff;
+  height: 48px;
+  margin-top: 4px;
+  background: var(--verde-principal);
+  color: var(--branco);
+  box-shadow: var(--sombra-botao);
+}
+
+.agendamento-primary:hover:not(:disabled) {
+  background: var(--verde-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(19, 88, 70, 0.25);
+}
+
+.agendamento-primary:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .agendamento-primary:disabled,
 .agendamento-list-header button:disabled {
-  cursor: wait;
-  opacity: 0.72;
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
-.agendamento-list {
-  overflow: hidden;
+/* ALERTAS */
+.agendamento-alert {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: var(--raio-input);
+  font-size: 0.84rem;
+  line-height: 1.45;
 }
 
+.agendamento-alert.error {
+  background: var(--vermelho-claro);
+  border: 1px solid rgba(205, 25, 30, 0.18);
+  color: var(--vermelho-suave);
+}
+
+.agendamento-alert.success {
+  background: var(--verde-claro);
+  border: 1px solid rgba(47, 158, 65, 0.18);
+  color: var(--verde-principal);
+}
+
+/* LISTA E TABELA DE BANCAS */
 .agendamento-list-header {
-  align-items: center;
-  border-bottom: 1px solid #e5e7eb;
   display: flex;
-  gap: 12px;
+  align-items: center;
   justify-content: space-between;
-  padding: 18px 20px;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--borda);
+  background: linear-gradient(180deg, #ffffff 0%, #f9fbf9 100%);
 }
 
 .agendamento-list-header h2 {
-  font-size: 1.05rem;
   margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--texto-principal);
 }
 
 .agendamento-list-header button {
-  background: #e8f3f1;
-  color: #115e59;
+  height: 38px;
+  padding: 0 16px;
+  background: var(--branco);
+  border: 1px solid var(--borda);
+  color: var(--verde-principal);
+}
+
+.agendamento-list-header button:hover:not(:disabled) {
+  background: var(--verde-claro);
+  color: var(--verde-hover);
+  border-color: rgba(47, 158, 65, 0.25);
 }
 
 .agendamento-table-wrap {
+  max-width: 100%;
   overflow-x: auto;
 }
 
 .agendamento-list table {
-  border-collapse: collapse;
-  min-width: 760px;
   width: 100%;
+  border-collapse: collapse;
 }
 
 .agendamento-list th,
 .agendamento-list td {
-  border-bottom: 1px solid #edf0f5;
-  font-size: 0.92rem;
-  padding: 13px 16px;
+  padding: 15px 24px;
   text-align: left;
+  font-size: 0.86rem;
   vertical-align: middle;
 }
 
 .agendamento-list th {
-  background: #fbfcfe;
-  color: #4b5563;
-  font-size: 0.78rem;
+  background: var(--verde-claro);
+  border-bottom: 2px solid var(--borda-suave);
+  color: var(--verde-principal);
+  font-size: 0.72rem;
+  font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
 }
 
+.agendamento-list tbody tr {
+  border-bottom: 1px solid var(--borda-suave);
+  transition: background-color var(--transicao);
+}
+
+.agendamento-list tbody tr:hover {
+  background: #f8faf9;
+}
+
+.agendamento-list td {
+  color: var(--texto-principal);
+}
+
+.agendamento-list td:first-child {
+  font-size: 0.8rem;
+  color: var(--texto-secundario);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+.ifam-link-externo {
+  color: var(--verde-principal);
+  font-weight: 600;
+  text-decoration: underline;
+  transition: color var(--transicao);
+}
+
+.ifam-link-externo:hover {
+  color: var(--cor-verde-marca);
+}
+
+.agendamento-list td:last-child {
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* BOTÃO CANCELAR */
 .agendamento-danger {
-  background: #fee2e2;
-  color: #991b1b;
-  min-height: 34px;
+  height: 34px;
+  padding: 0 14px;
+  background: var(--vermelho-claro);
+  border: 1px solid rgba(205, 25, 30, 0.18);
+  color: var(--vermelho-suave);
 }
 
-.agendamento-alert {
-  border-radius: 6px;
-  font-size: 0.9rem;
-  margin: 0;
-  padding: 10px 12px;
+.agendamento-danger:hover {
+  background: var(--vermelho-suave);
+  border-color: var(--vermelho-suave);
+  color: var(--branco);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(205, 25, 30, 0.15);
 }
 
-.agendamento-alert.error {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
-.agendamento-alert.success {
-  background: #dcfce7;
-  color: #166534;
+.agendamento-danger:active {
+  transform: translateY(0);
 }
 
 .agendamento-empty {
-  color: #6b7280;
   margin: 0;
-  padding: 20px;
+  padding: 48px 24px;
+  color: var(--texto-secundario);
+  font-size: 0.9rem;
+  text-align: center;
+  line-height: 1.5;
 }
 
-@media (max-width: 860px) {
-  .agendamento-page {
-    padding: 20px;
-  }
+.agendamento-empty::before {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 3px;
+  background: var(--verde-claro);
+  margin: 0 auto 16px;
+  border-radius: 2px;
+}
 
+/* --- RODAPÉ INSTITUCIONAL IFAM --- */
+.ifam-footer {
+  background: #18222d;
+  color: var(--branco);
+  border-top: 4px solid var(--cor-verde-marca);
+}
+
+.ifam-footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 40px;
+}
+
+.ifam-footer-brand h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--branco);
+  margin: 0 0 12px;
+  letter-spacing: 0.02em;
+}
+
+.ifam-footer-brand p {
+  font-size: 0.84rem;
+  color: #a0aec0;
+  line-height: 1.5;
+  margin: 0 0 8px;
+}
+
+.ifam-footer-brand .academic-purpose {
+  font-size: 0.78rem;
+  color: #718096;
+  font-style: italic;
+}
+
+.ifam-footer-contacts h5,
+.ifam-footer-info h5 {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--branco);
+  margin: 0 0 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ifam-footer-contacts p,
+.ifam-footer-info p {
+  font-size: 0.84rem;
+  color: #a0aec0;
+  line-height: 1.5;
+  margin: 0 0 10px;
+}
+
+.ifam-footer-contacts strong {
+  color: var(--branco);
+}
+
+.links-rodape {
+  margin-top: 14px !important;
+}
+
+.links-rodape a {
+  color: var(--cor-verde-marca);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color var(--transicao);
+}
+
+.links-rodape a:hover {
+  color: #5ed673;
+  text-decoration: underline;
+}
+
+.ifam-footer-bottom {
+  background: #111a22;
+  border-top: 1px solid #23303d;
+  padding: 20px 40px;
+  text-align: center;
+}
+
+.ifam-footer-bottom p {
+  margin: 0;
+  font-size: 0.76rem;
+  color: #718096;
+}
+
+/* --- RESPONSIVIDADE --- */
+@media (max-width: 900px) {
+  .ifam-header-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .ifam-system-title {
+    align-items: flex-start;
+    text-align: left;
+  }
+  
   .agendamento-grid {
     grid-template-columns: 1fr;
   }
-}
-
-@media (max-width: 560px) {
-  .agendamento-header h1 {
-    font-size: 1.55rem;
-  }
-
-  .agendamento-inline {
-    grid-template-columns: 1fr;
+  
+  .ifam-nav-content,
+  .ifam-breadcrumbs,
+  .agendamento-shell,
+  .ifam-footer-content {
+    padding-left: 24px;
+    padding-right: 24px;
   }
 }
+
