@@ -36,7 +36,8 @@
 }
 
 .ifam-header-top {
-  max-width: 1400px;
+  max-width: 1650px;
+  width: 95%;
   margin: 0 auto;
   padding: 10px 40px;
   display: flex;
@@ -44,6 +45,7 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 16px;
+  box-sizing: border-box;
 }
 
 .ifam-logo-container {
@@ -89,11 +91,13 @@
 }
 
 .ifam-nav-content {
-  max-width: 1200px;
+  max-width: 1650px;
+  width: 95%;
   margin: 0 auto;
   padding: 0 40px;
   display: flex;
   gap: 4px;
+  box-sizing: border-box;
 }
 
 .ifam-nav-link {
@@ -129,7 +133,8 @@
 }
 
 .ifam-breadcrumbs {
-  max-width: 1400px;
+  max-width: 1650px;
+  width: 95%;
   margin: 0 auto;
   padding: 8px 40px;
   font-size: 0.78rem;
@@ -137,6 +142,7 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+  box-sizing: border-box;
 }
 
 .label-voce {
@@ -170,8 +176,8 @@
 
 /* --- CONTEÚDO PRINCIPAL / SHELL --- */
 .agendamento-shell {
-  max-width: 1400px;
-  width: 92%;
+  max-width: 1650px;
+  width: 95%;
   margin: 0 auto;
   padding: 24px 40px 48px;
   box-sizing: border-box;
@@ -220,8 +226,8 @@
 /* --- GRID DE AGENDAMENTO --- */
 .agendamento-grid {
   display: grid;
-  grid-template-columns: minmax(0, 390px) minmax(0, 1fr);
-  gap: 28px;
+  grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+  gap: 40px;
   align-items: start;
 }
 
@@ -591,12 +597,14 @@
 }
 
 .ifam-footer-content {
-  max-width: 1200px;
+  max-width: 1650px;
+  width: 95%;
   margin: 0 auto;
   padding: 48px 40px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 40px;
+  box-sizing: border-box;
 }
 
 .ifam-footer-brand h4 {

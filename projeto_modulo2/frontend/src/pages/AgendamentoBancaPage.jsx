@@ -35,6 +35,9 @@ function getApiError(error) {
   }
 
   if (typeof detail === 'string') {
+    if (detail.trim().startsWith('<!DOCTYPE') || detail.includes('<html') || detail.includes('Django')) {
+      return 'Erro interno do servidor. O tema informado pode já ter uma banca agendada ou ocorreu um conflito de dados no banco.'
+    }
     return detail
   }
 
@@ -269,6 +272,17 @@ export default function AgendamentoBancaPage() {
     if (new Date(form.data_hora_inicio) >= new Date(form.data_hora_fim)) {
       setFormError('A data de fim deve ser posterior à data de início.')
       addToast('A data de fim deve ser posterior à data de início.', 'error')
+      setSaving(false)
+      return
+    }
+
+    // Validação preventiva: impede envio caso o UUID do tema já tenha banca cadastrada na listagem local
+    const jaAgendado = agendamentos.some(
+      (item) => String(item.tema_tcc_id).trim().toLowerCase() === String(form.tema_tcc_id).trim().toLowerCase()
+    )
+    if (jaAgendado) {
+      setFormError('Este tema de TCC já possui uma banca agendada. Cada tema só pode ter uma única banca.')
+      addToast('Este tema de TCC já possui uma banca agendada.', 'error')
       setSaving(false)
       return
     }
