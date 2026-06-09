@@ -1186,3 +1186,50 @@
   animation: shimmer 1.5s infinite linear;
 }
 
+/* --- ESTILIZAÇÃO DE ÍCONES VETORIAIS (SVG) --- */
+.stat-svg-icon {
+  width: 28px;
+  height: 28px;
+  color: var(--verde-principal);
+}
+
+.agendamento-stat-card.proxima .stat-svg-icon {
+  color: #dd6b20;
+}
+
+.agendamento-stat-card.distrib .stat-svg-icon {
+  color: #3182ce;
+}
+
+.toast-svg-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.toast-item.success .toast-svg-icon {
+  color: var(--cor-verde-marca);
+}
+
+.toast-item.error .toast-svg-icon {
+  color: var(--cor-vermelho-marca);
+}
+
+.warning-svg-icon {
+  width: 16px;
+  height: 16px;
+  color: inherit;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+/* --- BADGE STATUS DOTS --- */
+.badge-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: currentColor;
+  margin-right: 2px;
+}
+

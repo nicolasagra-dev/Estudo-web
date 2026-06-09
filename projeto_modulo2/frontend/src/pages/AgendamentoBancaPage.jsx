@@ -407,7 +407,12 @@ export default function AgendamentoBancaPage() {
         {/* Cards de Estatísticas */}
         <section className="agendamento-stats-grid">
           <div className="agendamento-stat-card total">
-            <span className="stat-icon">🎓</span>
+            <span className="stat-icon" style={{ display: 'flex', alignItems: 'center' }}>
+              <svg className="stat-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"/>
+              </svg>
+            </span>
             <div className="stat-info">
               <span className="stat-label">Total de Bancas</span>
               <span className="stat-value">{stats.total} {stats.total === 1 ? 'Banca' : 'Bancas'}</span>
@@ -415,7 +420,14 @@ export default function AgendamentoBancaPage() {
             </div>
           </div>
           <div className="agendamento-stat-card proxima">
-            <span className="stat-icon">📅</span>
+            <span className="stat-icon" style={{ display: 'flex', alignItems: 'center' }}>
+              <svg className="stat-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+            </span>
             <div className="stat-info">
               <span className="stat-label">Próxima Defesa</span>
               <span className="stat-value">{stats.proximaBanca}</span>
@@ -423,7 +435,13 @@ export default function AgendamentoBancaPage() {
             </div>
           </div>
           <div className="agendamento-stat-card distribu">
-            <span className="stat-icon">💻</span>
+            <span className="stat-icon" style={{ display: 'flex', alignItems: 'center' }}>
+              <svg className="stat-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                <line x1="8" y1="21" x2="16" y2="21"/>
+                <line x1="12" y1="17" x2="12" y2="21"/>
+              </svg>
+            </span>
             <div className="stat-info">
               <span className="stat-label">Distribuição</span>
               <span className="stat-value">{stats.presencial} Presenciais</span>
@@ -491,7 +509,12 @@ export default function AgendamentoBancaPage() {
 
               {showDateWarning && (
                 <div className="realtime-error">
-                  ⚠ A data final deve ser posterior à data de início.
+                  <svg className="warning-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                  </svg>
+                  <span>A data final deve ser posterior à data de início.</span>
                 </div>
               )}
 
@@ -522,7 +545,12 @@ export default function AgendamentoBancaPage() {
 
               {localConflict && (
                 <div className="realtime-warning">
-                  ⚠ Atenção: Já existe banca agendada neste local/link com horário sobreposto.
+                  <svg className="warning-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                  </svg>
+                  <span>Atenção: Já existe banca agendada neste local/link com horário sobreposto.</span>
                 </div>
               )}
 
@@ -551,7 +579,7 @@ export default function AgendamentoBancaPage() {
             {/* Painel de Busca e Filtros */}
             <div className="agendamento-filter-panel">
               <div className="filter-field filter-field-text">
-                <label htmlFor="filter-tema-input">🔍 Buscar banca (Tema/Local)</label>
+                <label htmlFor="filter-tema-input">Buscar banca (Tema/Local)</label>
                 <div className="filter-input-with-icon">
                   <input
                     id="filter-tema-input"
@@ -564,7 +592,7 @@ export default function AgendamentoBancaPage() {
               </div>
 
               <div className="filter-field filter-field-date">
-                <label htmlFor="filter-inicio-input">📅 Período (Início)</label>
+                <label htmlFor="filter-inicio-input">Período (Início)</label>
                 <input
                   id="filter-inicio-input"
                   type="datetime-local"
@@ -574,7 +602,7 @@ export default function AgendamentoBancaPage() {
               </div>
 
               <div className="filter-field filter-field-date">
-                <label htmlFor="filter-fim-input">📅 Período (Fim)</label>
+                <label htmlFor="filter-fim-input">Período (Fim)</label>
                 <input
                   id="filter-fim-input"
                   type="datetime-local"
@@ -664,7 +692,7 @@ export default function AgendamentoBancaPage() {
                               <td>{formatDateTime(item.data_hora_inicio)}</td>
                               <td>{formatDateTime(item.data_hora_fim)}</td>
                               <td>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-start' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'flex-start' }}>
                                   {item.local_ou_link.startsWith('http') ? (
                                     <a href={item.local_ou_link} target="_blank" rel="noopener noreferrer" className="ifam-link-externo">
                                       Acessar link
@@ -672,11 +700,27 @@ export default function AgendamentoBancaPage() {
                                   ) : (
                                     <span>{item.local_ou_link}</span>
                                   )}
-                                  <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '2px' }}>
-                                    {isPresencial && <span className="banca-badge presencial">🟢 Presencial</span>}
-                                    {isOnline && <span className="banca-badge online">🔵 Online</span>}
-                                    {isHoje && <span className="banca-badge hoje">🟠 Hoje</span>}
-                                    {isConflict && <span className="banca-badge conflito" title="Sobreposição de horário e local com outra defesa">🔴 Conflito</span>}
+                                  <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '2px' }}>
+                                    {isPresencial && (
+                                      <span className="banca-badge presencial">
+                                        <span className="badge-dot"></span> Presencial
+                                      </span>
+                                    )}
+                                    {isOnline && (
+                                      <span className="banca-badge online">
+                                        <span className="badge-dot"></span> Online
+                                      </span>
+                                    )}
+                                    {isHoje && (
+                                      <span className="banca-badge hoje">
+                                        <span className="badge-dot"></span> Hoje
+                                      </span>
+                                    )}
+                                    {isConflict && (
+                                      <span className="banca-badge conflito" title="Sobreposição de horário e local com outra defesa">
+                                        <span className="badge-dot"></span> Conflito
+                                      </span>
+                                    )}
                                   </div>
                                 </div>
                               </td>
@@ -745,7 +789,14 @@ export default function AgendamentoBancaPage() {
                 <li><strong>Evite Conflitos:</strong> O sistema validará em tempo real se a sala escolhida já está ocupada no horário selecionado. Caso esteja, altere a sala ou o horário.</li>
                 <li><strong>Finalize:</strong> Clique em "Agendar banca". Você receberá uma notificação de sucesso e o agendamento aparecerá na tabela.</li>
               </ol>
-              <h4>⚠️ Regras Importantes</h4>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '18px', marginBottom: '8px', color: 'var(--verde-principal)' }}>
+                <svg className="warning-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '18px', height: '18px' }}>
+                  <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                  <line x1="12" y1="9" x2="12" y2="13"/>
+                  <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                <h4 style={{ margin: 0 }}>Regras Importantes</h4>
+              </div>
               <ul>
                 <li>A data final deve ser obrigatoriamente posterior à data inicial.</li>
                 <li>O tema informado deve ter parecer favorável de aptidão para defesa registrado pelo orientador.</li>
@@ -759,7 +810,18 @@ export default function AgendamentoBancaPage() {
       <div className="agendamento-toasts">
         {toasts.map((t) => (
           <div key={t.id} className={`toast-item ${t.type}`}>
-            <span className="toast-icon">{t.type === 'success' ? '✅' : '❌'}</span>
+            <span className="toast-icon" style={{ display: 'flex', alignItems: 'center' }}>
+              {t.type === 'success' ? (
+                <svg className="toast-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              ) : (
+                <svg className="toast-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              )}
+            </span>
             <div className="toast-content">{t.message}</div>
             <button className="toast-close" onClick={() => setToasts((prev) => prev.filter((item) => item.id !== t.id))}>×</button>
           </div>
