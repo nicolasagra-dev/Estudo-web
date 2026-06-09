@@ -22,11 +22,16 @@ function formatDateTime(value) {
   }).format(new Date(value))
 }
 
+function getLocalISOString(date = new Date()) {
+  const tzoffset = date.getTimezoneOffset() * 60000
+  return new Date(date.getTime() - tzoffset).toISOString().slice(0, 16)
+}
+
 function getApiError(error) {
   const detail = error?.response?.data
 
   if (!detail) {
-    return 'Nao foi possivel conectar com a API.'
+    return 'Não foi possível conectar com a API.'
   }
 
   if (typeof detail === 'string') {
@@ -50,13 +55,18 @@ export default function AgendamentoBancaPage() {
   const [agendamentos, setAgendamentos] = useState([])
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
+  const [formError, setFormError] = useState('')
+  const [formSuccess, setFormSuccess] = useState('')
+  const [listError, setListError] = useState('')
+  const [listSuccess, setListSuccess] = useState('')
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null)
 
   // Estados para busca e filtragem
   const [filterTema, setFilterTema] = useState('')
   const [filterDataInicio, setFilterDataInicio] = useState('')
   const [filterDataFim, setFilterDataFim] = useState('')
+
+  const minInicio = useMemo(() => getLocalISOString(), [])
 
   const sortedAgendamentos = useMemo(() => {
     return [...agendamentos].sort(
@@ -94,13 +104,13 @@ export default function AgendamentoBancaPage() {
 
   async function carregarAgendamentos() {
     setLoading(true)
-    setError('')
+    setListError('')
 
     try {
       const data = await listarAgendamentos()
       setAgendamentos(Array.isArray(data) ? data : data.results || [])
     } catch (err) {
-      setError(getApiError(err))
+      setListError(getApiError(err))
     } finally {
       setLoading(false)
     }
@@ -113,6 +123,20 @@ export default function AgendamentoBancaPage() {
     })
   }, [])
 
+  useEffect(() => {
+    if (formSuccess) {
+      const t = setTimeout(() => setFormSuccess(''), 4000)
+      return () => clearTimeout(t)
+    }
+  }, [formSuccess])
+
+  useEffect(() => {
+    if (listSuccess) {
+      const t = setTimeout(() => setListSuccess(''), 4000)
+      return () => clearTimeout(t)
+    }
+  }, [listSuccess])
+
   function handleChange(event) {
     const { name, value } = event.target
     setForm((current) => ({ ...current, [name]: value }))
@@ -121,8 +145,14 @@ export default function AgendamentoBancaPage() {
   async function handleSubmit(event) {
     event.preventDefault()
     setSaving(true)
-    setError('')
-    setSuccess('')
+    setFormError('')
+    setFormSuccess('')
+
+    if (new Date(form.data_hora_inicio) >= new Date(form.data_hora_fim)) {
+      setFormError('A data de fim deve ser posterior à data de início.')
+      setSaving(false)
+      return
+    }
 
     try {
       await criarAgendamento({
@@ -131,28 +161,26 @@ export default function AgendamentoBancaPage() {
         data_hora_fim: new Date(form.data_hora_fim).toISOString(),
       })
       setForm(initialForm)
-      setSuccess('Banca agendada com sucesso.')
+      setFormSuccess('Banca agendada com sucesso.')
       await carregarAgendamentos()
     } catch (err) {
-      setError(getApiError(err))
+      setFormError(getApiError(err))
     } finally {
       setSaving(false)
     }
   }
 
   async function handleCancel(id) {
-    const confirmed = window.confirm('Cancelar este agendamento?')
-    if (!confirmed) return
-
-    setError('')
-    setSuccess('')
+    setListError('')
+    setListSuccess('')
 
     try {
       await cancelarAgendamento(id)
-      setSuccess('Agendamento cancelado.')
+      setListSuccess('Agendamento cancelado.')
+      setConfirmDeleteId(null)
       await carregarAgendamentos()
     } catch (err) {
-      setError(getApiError(err))
+      setListError(getApiError(err))
     }
   }
 
@@ -204,10 +232,10 @@ export default function AgendamentoBancaPage() {
 
         <nav className="ifam-nav">
           <div className="ifam-nav-content">
-            <a href="#inicio" className="ifam-nav-link">Início</a>
-            <a href="#temas" className="ifam-nav-link">Temas TCC</a>
+            <span role="link" aria-disabled="true" className="ifam-nav-link ifam-nav-disabled" title="Funcionalidade em desenvolvimento">Início</span>
+            <span role="link" aria-disabled="true" className="ifam-nav-link ifam-nav-disabled" title="Funcionalidade em desenvolvimento">Temas TCC</span>
             <a href="#bancas" className="ifam-nav-link active">Agendamento de Bancas</a>
-            <a href="#relatorios" className="ifam-nav-link">Relatórios</a>
+            <span role="link" aria-disabled="true" className="ifam-nav-link ifam-nav-disabled" title="Funcionalidade em desenvolvimento">Relatórios</span>
           </div>
         </nav>
       </header>
@@ -216,10 +244,10 @@ export default function AgendamentoBancaPage() {
       <div className="ifam-breadcrumbs-container">
         <div className="ifam-breadcrumbs">
           <span className="label-voce">Você está aqui: </span>
-          <a href="#inicio" className="crumb-link">Início</a>
-          <span className="separator">/</span>
+          <span role="link" aria-disabled="true" className="crumb-link" style={{ cursor: 'default', textDecoration: 'none' }} title="Funcionalidade em desenvolvimento">Início</span>
+          <span className="separator" aria-hidden="true">/</span>
           <a href="#bancas" className="crumb-link">Bancas</a>
-          <span className="separator">/</span>
+          <span className="separator" aria-hidden="true">/</span>
           <span className="current">Agendamento</span>
         </div>
       </div>
@@ -242,15 +270,20 @@ export default function AgendamentoBancaPage() {
             </div>
 
             <div className="agendamento-form-fields">
-              <label>
-                Tema TCC (ID)
+              <label htmlFor="tema-tcc-input">
+                ID do Tema de TCC
                 <input
+                  id="tema-tcc-input"
                   name="tema_tcc_id"
                   value={form.tema_tcc_id}
                   onChange={handleChange}
                   placeholder="UUID do tema ou ID do TCC"
                   required
+                  aria-describedby="tema-tcc-help"
                 />
+                <small id="tema-tcc-help" className="form-help-text">
+                  Informe o ID numérico ou UUID do tema já cadastrado no sistema.
+                </small>
               </label>
 
               <div className="agendamento-inline">
@@ -261,6 +294,7 @@ export default function AgendamentoBancaPage() {
                     type="datetime-local"
                     value={form.data_hora_inicio}
                     onChange={handleChange}
+                    min={minInicio}
                     required
                   />
                 </label>
@@ -272,6 +306,7 @@ export default function AgendamentoBancaPage() {
                     type="datetime-local"
                     value={form.data_hora_fim}
                     onChange={handleChange}
+                    min={form.data_hora_inicio || minInicio}
                     required
                   />
                 </label>
@@ -288,8 +323,8 @@ export default function AgendamentoBancaPage() {
                 />
               </label>
 
-              {error && <p className="agendamento-alert error">{error}</p>}
-              {success && <p className="agendamento-alert success">{success}</p>}
+              {formError && <p className="agendamento-alert error" role="alert">{formError}</p>}
+              {formSuccess && <p className="agendamento-alert success" role="status">{formSuccess}</p>}
 
               <button className="agendamento-primary" type="submit" disabled={saving}>
                 {saving ? 'Agendando...' : 'Agendar banca'}
@@ -344,6 +379,7 @@ export default function AgendamentoBancaPage() {
                 <button
                   type="button"
                   className="agendamento-clear-filters"
+                  aria-label="Limpar todos os filtros de busca"
                   onClick={() => {
                     setFilterTema('')
                     setFilterDataInicio('')
@@ -355,7 +391,41 @@ export default function AgendamentoBancaPage() {
               )}
             </div>
 
-            {sortedAgendamentos.length === 0 && !loading ? (
+            {(filterTema || filterDataInicio || filterDataFim) && filteredAgendamentos.length > 0 && (
+              <p className="agendamento-filter-count">
+                Mostrando {filteredAgendamentos.length} de {sortedAgendamentos.length} {filteredAgendamentos.length === 1 ? 'banca' : 'bancas'}
+              </p>
+            )}
+
+            {listError && <p className="agendamento-alert error" role="alert" style={{ margin: '16px 24px 0' }}>{listError}</p>}
+            {listSuccess && <p className="agendamento-alert success" role="status" style={{ margin: '16px 24px 0' }}>{listSuccess}</p>}
+
+            {loading && agendamentos.length === 0 ? (
+              <div className="agendamento-table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Tema</th>
+                      <th>Início</th>
+                      <th>Fim</th>
+                      <th>Local / Link</th>
+                      <th aria-label="Ações" />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[1, 2, 3].map((i) => (
+                      <tr key={`skeleton-${i}`}>
+                        <td><div className="skeleton-cell" /></td>
+                        <td><div className="skeleton-cell" /></td>
+                        <td><div className="skeleton-cell" /></td>
+                        <td><div className="skeleton-cell" /></td>
+                        <td><div className="skeleton-cell" /></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : sortedAgendamentos.length === 0 ? (
               <p className="agendamento-empty">Nenhuma banca agendada.</p>
             ) : (
               <>
@@ -389,13 +459,32 @@ export default function AgendamentoBancaPage() {
                               )}
                             </td>
                             <td>
-                              <button
-                                className="agendamento-danger"
-                                type="button"
-                                onClick={() => handleCancel(item.id)}
-                              >
-                                Cancelar
-                              </button>
+                              {confirmDeleteId === item.id ? (
+                                <div className="agendamento-confirm-group">
+                                  <button
+                                    className="agendamento-danger agendamento-confirm-btn"
+                                    type="button"
+                                    onClick={() => handleCancel(item.id)}
+                                  >
+                                    Confirmar
+                                  </button>
+                                  <button
+                                    className="agendamento-secondary agendamento-cancel-btn"
+                                    type="button"
+                                    onClick={() => setConfirmDeleteId(null)}
+                                  >
+                                    Desistir
+                                  </button>
+                                </div>
+                              ) : (
+                                <button
+                                  className="agendamento-danger"
+                                  type="button"
+                                  onClick={() => setConfirmDeleteId(item.id)}
+                                >
+                                  Cancelar
+                                </button>
+                              )}
                             </td>
                           </tr>
                         ))}
