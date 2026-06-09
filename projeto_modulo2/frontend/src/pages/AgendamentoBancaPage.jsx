@@ -458,8 +458,12 @@ export default function AgendamentoBancaPage() {
             </span>
             <div className="stat-info">
               <span className="stat-label">Distribuição</span>
-              <span className="stat-value">{stats.presencial} Presenciais</span>
-              <span className="stat-subtext">{stats.online} Online</span>
+              <span className="stat-value">
+                {stats.presencial} {stats.presencial === 1 ? 'Presencial' : 'Presenciais'}
+              </span>
+              <span className="stat-subtext">
+                {stats.online} Online
+              </span>
             </div>
           </div>
         </section>
