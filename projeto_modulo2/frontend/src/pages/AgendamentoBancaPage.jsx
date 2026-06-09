@@ -53,11 +53,44 @@ export default function AgendamentoBancaPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
+  // Estados para busca e filtragem
+  const [filterTema, setFilterTema] = useState('')
+  const [filterDataInicio, setFilterDataInicio] = useState('')
+  const [filterDataFim, setFilterDataFim] = useState('')
+
   const sortedAgendamentos = useMemo(() => {
     return [...agendamentos].sort(
       (a, b) => new Date(a.data_hora_inicio) - new Date(b.data_hora_inicio),
     )
   }, [agendamentos])
+
+  const filteredAgendamentos = useMemo(() => {
+    return sortedAgendamentos.filter((item) => {
+      // Filtrar por tema ou local (busca por texto parcial, case-insensitive)
+      if (filterTema) {
+        const query = filterTema.toLowerCase()
+        const matchTema = item.tema_tcc_id && String(item.tema_tcc_id).toLowerCase().includes(query)
+        const matchLocal = item.local_ou_link && String(item.local_ou_link).toLowerCase().includes(query)
+        if (!matchTema && !matchLocal) return false
+      }
+
+      // Filtrar por período inicial
+      if (filterDataInicio) {
+        const startLimit = new Date(filterDataInicio)
+        const itemStart = new Date(item.data_hora_inicio)
+        if (itemStart < startLimit) return false
+      }
+
+      // Filtrar por período final
+      if (filterDataFim) {
+        const endLimit = new Date(filterDataFim)
+        const itemStart = new Date(item.data_hora_inicio)
+        if (itemStart > endLimit) return false
+      }
+
+      return true
+    })
+  }, [sortedAgendamentos, filterTema, filterDataInicio, filterDataFim])
 
   async function carregarAgendamentos() {
     setLoading(true)
@@ -272,49 +305,105 @@ export default function AgendamentoBancaPage() {
               </button>
             </div>
 
+            {/* Painel de Busca e Filtros */}
+            <div className="agendamento-filter-panel">
+              <div className="filter-field filter-field-text">
+                <label htmlFor="filter-tema-input">Buscar por tema ou local</label>
+                <div className="filter-input-with-icon">
+                  <input
+                    id="filter-tema-input"
+                    type="text"
+                    placeholder="Digite tema, link ou sala..."
+                    value={filterTema}
+                    onChange={(e) => setFilterTema(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="filter-field filter-field-date">
+                <label htmlFor="filter-inicio-input">Período de início</label>
+                <input
+                  id="filter-inicio-input"
+                  type="datetime-local"
+                  value={filterDataInicio}
+                  onChange={(e) => setFilterDataInicio(e.target.value)}
+                />
+              </div>
+
+              <div className="filter-field filter-field-date">
+                <label htmlFor="filter-fim-input">Período até</label>
+                <input
+                  id="filter-fim-input"
+                  type="datetime-local"
+                  value={filterDataFim}
+                  onChange={(e) => setFilterDataFim(e.target.value)}
+                />
+              </div>
+
+              {(filterTema || filterDataInicio || filterDataFim) && (
+                <button
+                  type="button"
+                  className="agendamento-clear-filters"
+                  onClick={() => {
+                    setFilterTema('')
+                    setFilterDataInicio('')
+                    setFilterDataFim('')
+                  }}
+                >
+                  Limpar
+                </button>
+              )}
+            </div>
+
             {sortedAgendamentos.length === 0 && !loading ? (
               <p className="agendamento-empty">Nenhuma banca agendada.</p>
             ) : (
-              <div className="agendamento-table-wrap">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Tema</th>
-                      <th>Início</th>
-                      <th>Fim</th>
-                      <th>Local / Link</th>
-                      <th aria-label="Ações" />
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {sortedAgendamentos.map((item) => (
-                      <tr key={item.id}>
-                        <td>{item.tema_tcc_id}</td>
-                        <td>{formatDateTime(item.data_hora_inicio)}</td>
-                        <td>{formatDateTime(item.data_hora_fim)}</td>
-                        <td>
-                          {item.local_ou_link.startsWith('http') ? (
-                            <a href={item.local_ou_link} target="_blank" rel="noopener noreferrer" className="ifam-link-externo">
-                              Acessar link
-                            </a>
-                          ) : (
-                            item.local_ou_link
-                          )}
-                        </td>
-                        <td>
-                          <button
-                            className="agendamento-danger"
-                            type="button"
-                            onClick={() => handleCancel(item.id)}
-                          >
-                            Cancelar
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <>
+                {filteredAgendamentos.length === 0 ? (
+                  <p className="agendamento-empty">Nenhum agendamento encontrado para os filtros selecionados.</p>
+                ) : (
+                  <div className="agendamento-table-wrap">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Tema</th>
+                          <th>Início</th>
+                          <th>Fim</th>
+                          <th>Local / Link</th>
+                          <th aria-label="Ações" />
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredAgendamentos.map((item) => (
+                          <tr key={item.id}>
+                            <td>{item.tema_tcc_id}</td>
+                            <td>{formatDateTime(item.data_hora_inicio)}</td>
+                            <td>{formatDateTime(item.data_hora_fim)}</td>
+                            <td>
+                              {item.local_ou_link.startsWith('http') ? (
+                                <a href={item.local_ou_link} target="_blank" rel="noopener noreferrer" className="ifam-link-externo">
+                                  Acessar link
+                                </a>
+                              ) : (
+                                item.local_ou_link
+                              )}
+                            </td>
+                            <td>
+                              <button
+                                className="agendamento-danger"
+                                type="button"
+                                onClick={() => handleCancel(item.id)}
+                              >
+                                Cancelar
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </>
             )}
           </section>
         </section>

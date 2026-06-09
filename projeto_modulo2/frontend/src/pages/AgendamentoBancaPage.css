@@ -399,6 +399,75 @@
   border-color: rgba(47, 158, 65, 0.25);
 }
 
+/* --- PAINEL DE FILTROS --- */
+.agendamento-filter-panel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px;
+  padding: 16px 24px;
+  background: #fafbfc;
+  border-bottom: 1px solid var(--borda-suave);
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.filter-field-text {
+  flex: 2 1 200px;
+}
+
+.filter-field-date {
+  flex: 1 1 180px;
+}
+
+.filter-field label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--texto-secundario);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.filter-field input {
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-input);
+  background: var(--branco);
+  color: var(--texto-principal);
+  font-size: 0.86rem;
+  transition: border-color var(--transicao), box-shadow var(--transicao);
+}
+
+.filter-field input:focus {
+  border-color: var(--cor-verde-marca);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--verde-focus);
+}
+
+.agendamento-clear-filters {
+  height: 38px;
+  padding: 0 16px;
+  background: var(--vermelho-claro);
+  border: 1px solid rgba(205, 25, 30, 0.15);
+  border-radius: var(--raio-botao);
+  color: var(--vermelho-suave);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transicao), color var(--transicao);
+}
+
+.agendamento-clear-filters:hover {
+  background: var(--vermelho-suave);
+  color: var(--branco);
+}
+
 .agendamento-table-wrap {
   max-width: 100%;
   overflow-x: auto;
