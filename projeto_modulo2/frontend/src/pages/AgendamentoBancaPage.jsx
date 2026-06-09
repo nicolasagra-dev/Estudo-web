@@ -60,6 +60,12 @@ export default function AgendamentoBancaPage() {
   const [listError, setListError] = useState('')
   const [listSuccess, setListSuccess] = useState('')
   const [confirmDeleteId, setConfirmDeleteId] = useState(null)
+  const [cancellingId, setCancellingId] = useState(null)
+
+  // Estados extras de UI
+  const [toasts, setToasts] = useState([])
+  const [helpOpen, setHelpOpen] = useState(false)
+  const [localOption, setLocalOption] = useState('Sala 301')
 
   // Estados para busca e filtragem
   const [filterTema, setFilterTema] = useState('')
@@ -67,6 +73,95 @@ export default function AgendamentoBancaPage() {
   const [filterDataFim, setFilterDataFim] = useState('')
 
   const minInicio = useMemo(() => getLocalISOString(), [])
+
+  // Auxiliar para adicionar Toasts
+  const addToast = (message, type = 'success') => {
+    const id = Date.now()
+    setToasts((prev) => [...prev, { id, message, type }])
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id))
+    }, 4000)
+  }
+
+  // Sincroniza localOption com form.local_ou_link
+  useEffect(() => {
+    if (localOption !== 'custom') {
+      setForm((current) => ({ ...current, local_ou_link: localOption }))
+    } else {
+      setForm((current) => ({ ...current, local_ou_link: '' }))
+    }
+  }, [localOption])
+
+  // Estatísticas do portal
+  const stats = useMemo(() => {
+    const total = agendamentos.length
+    const now = new Date()
+    const futureAgendamentos = agendamentos
+      .filter((item) => new Date(item.data_hora_inicio) > now)
+      .sort((a, b) => new Date(a.data_hora_inicio) - new Date(b.data_hora_inicio))
+    
+    const proximaBanca = futureAgendamentos.length > 0 
+      ? formatDateTime(futureAgendamentos[0].data_hora_inicio)
+      : 'Nenhuma agendada'
+      
+    let presencial = 0
+    let online = 0
+    agendamentos.forEach((item) => {
+      const loc = item.local_ou_link.toLowerCase()
+      if (loc.includes('sala')) {
+        presencial++
+      } else if (loc.startsWith('http') || loc.includes('meet') || loc.includes('zoom') || loc.includes('link')) {
+        online++
+      } else {
+        presencial++
+      }
+    })
+    
+    return { total, proximaBanca, presencial, online }
+  }, [agendamentos])
+
+  // Validação em tempo real: avisar se a data final <= data inicial
+  const showDateWarning = useMemo(() => {
+    return form.data_hora_inicio && form.data_hora_fim && new Date(form.data_hora_fim) <= new Date(form.data_hora_inicio)
+  }, [form.data_hora_inicio, form.data_hora_fim])
+
+  // Validação em tempo real: detectar conflito local de sala na listagem
+  const localConflict = useMemo(() => {
+    if (!form.data_hora_inicio || !form.data_hora_fim || !form.local_ou_link) return null
+    const start = new Date(form.data_hora_inicio)
+    const end = new Date(form.data_hora_fim)
+    if (end <= start) return null
+    
+    const overlap = agendamentos.find((item) => {
+      const itemStart = new Date(item.data_hora_inicio)
+      const itemEnd = new Date(item.data_hora_fim)
+      const sameLocal = item.local_ou_link.trim().toLowerCase() === form.local_ou_link.trim().toLowerCase()
+      return sameLocal && itemStart < end && itemEnd > start
+    })
+    return overlap || null
+  }, [form.data_hora_inicio, form.data_hora_fim, form.local_ou_link, agendamentos])
+
+  // Identifica todos os conflitos gerais da tabela (bancas sobrepostas)
+  const conflictsSet = useMemo(() => {
+    const conflicts = new Set()
+    for (let i = 0; i < agendamentos.length; i++) {
+      for (let j = i + 1; j < agendamentos.length; j++) {
+        const a = agendamentos[i]
+        const b = agendamentos[j]
+        if (a.local_ou_link.trim().toLowerCase() === b.local_ou_link.trim().toLowerCase()) {
+          const aStart = new Date(a.data_hora_inicio)
+          const aEnd = new Date(a.data_hora_fim)
+          const bStart = new Date(b.data_hora_inicio)
+          const bEnd = new Date(b.data_hora_fim)
+          if (aStart < bEnd && bStart < aEnd) {
+            conflicts.add(a.id)
+            conflicts.add(b.id)
+          }
+        }
+      }
+    }
+    return conflicts
+  }, [agendamentos])
 
   const sortedAgendamentos = useMemo(() => {
     return [...agendamentos].sort(
@@ -142,6 +237,29 @@ export default function AgendamentoBancaPage() {
     setForm((current) => ({ ...current, [name]: value }))
   }
 
+  // Atalhos Rápidos de data
+  const handleQuickDate = (type) => {
+    const start = new Date()
+    start.setMinutes(0, 0, 0)
+    if (type === 'hoje') {
+      start.setHours(start.getHours() + 1)
+    } else if (type === 'amanha') {
+      start.setDate(start.getDate() + 1)
+      start.setHours(14)
+    } else if (type === 'proxima-semana') {
+      const day = start.getDay()
+      const daysToAdd = day === 0 ? 1 : 8 - day
+      start.setDate(start.getDate() + daysToAdd)
+      start.setHours(14)
+    }
+    const end = new Date(start.getTime() + 60 * 60 * 1000) // 1 hora de duração
+    setForm((current) => ({
+      ...current,
+      data_hora_inicio: getLocalISOString(start),
+      data_hora_fim: getLocalISOString(end),
+    }))
+  }
+
   async function handleSubmit(event) {
     event.preventDefault()
     setSaving(true)
@@ -150,6 +268,7 @@ export default function AgendamentoBancaPage() {
 
     if (new Date(form.data_hora_inicio) >= new Date(form.data_hora_fim)) {
       setFormError('A data de fim deve ser posterior à data de início.')
+      addToast('A data de fim deve ser posterior à data de início.', 'error')
       setSaving(false)
       return
     }
@@ -161,10 +280,14 @@ export default function AgendamentoBancaPage() {
         data_hora_fim: new Date(form.data_hora_fim).toISOString(),
       })
       setForm(initialForm)
+      setLocalOption('Sala 301')
       setFormSuccess('Banca agendada com sucesso.')
+      addToast('Banca agendada com sucesso.', 'success')
       await carregarAgendamentos()
     } catch (err) {
-      setFormError(getApiError(err))
+      const errMsg = getApiError(err)
+      setFormError(errMsg)
+      addToast(errMsg, 'error')
     } finally {
       setSaving(false)
     }
@@ -173,14 +296,20 @@ export default function AgendamentoBancaPage() {
   async function handleCancel(id) {
     setListError('')
     setListSuccess('')
+    setCancellingId(id)
 
     try {
       await cancelarAgendamento(id)
       setListSuccess('Agendamento cancelado.')
+      addToast('Agendamento cancelado.', 'success')
       setConfirmDeleteId(null)
       await carregarAgendamentos()
     } catch (err) {
-      setListError(getApiError(err))
+      const errMsg = getApiError(err)
+      setListError(errMsg)
+      addToast(errMsg, 'error')
+    } finally {
+      setCancellingId(null)
     }
   }
 
@@ -254,13 +383,54 @@ export default function AgendamentoBancaPage() {
 
       {/* Conteúdo Principal */}
       <main className="agendamento-shell">
-        <header className="agendamento-header">
-          <h1>Agendamento de Bancas</h1>
-          <p className="agendamento-subtitle">
-            Gestão acadêmica de defesas — cadastre horários, local ou link e acompanhe as
-            bancas agendadas.
-          </p>
+        <header className="agendamento-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h1>
+              Agendamento de Bancas
+              <button 
+                type="button" 
+                className="help-trigger-btn" 
+                onClick={() => setHelpOpen(true)}
+                title="Como agendar uma banca"
+                aria-label="Ajuda e orientações"
+              >
+                ?
+              </button>
+            </h1>
+            <p className="agendamento-subtitle">
+              Gestão acadêmica de defesas — cadastre horários, local ou link e acompanhe as
+              bancas agendadas.
+            </p>
+          </div>
         </header>
+
+        {/* Cards de Estatísticas */}
+        <section className="agendamento-stats-grid">
+          <div className="agendamento-stat-card total">
+            <span className="stat-icon">🎓</span>
+            <div className="stat-info">
+              <span className="stat-label">Total de Bancas</span>
+              <span className="stat-value">{stats.total} {stats.total === 1 ? 'Banca' : 'Bancas'}</span>
+              <span className="stat-subtext">agendadas no sistema</span>
+            </div>
+          </div>
+          <div className="agendamento-stat-card proxima">
+            <span className="stat-icon">📅</span>
+            <div className="stat-info">
+              <span className="stat-label">Próxima Defesa</span>
+              <span className="stat-value">{stats.proximaBanca}</span>
+              <span className="stat-subtext">próximo compromisso</span>
+            </div>
+          </div>
+          <div className="agendamento-stat-card distribu">
+            <span className="stat-icon">💻</span>
+            <div className="stat-info">
+              <span className="stat-label">Distribuição</span>
+              <span className="stat-value">{stats.presencial} Presenciais</span>
+              <span className="stat-subtext">{stats.online} Online</span>
+            </div>
+          </div>
+        </section>
 
         <section className="agendamento-grid">
           <form className="agendamento-form" onSubmit={handleSubmit}>
@@ -312,22 +482,60 @@ export default function AgendamentoBancaPage() {
                 </label>
               </div>
 
-              <label>
+              <div className="quick-options-container" style={{ marginTop: '-10px', marginBottom: '8px' }}>
+                <span style={{ fontSize: '0.72rem', fontWeight: 'bold', color: 'var(--texto-secundario)' }}>Definir data: </span>
+                <button type="button" className="quick-btn" onClick={() => handleQuickDate('hoje')}>Hoje (breve)</button>
+                <button type="button" className="quick-btn" onClick={() => handleQuickDate('amanha')}>Amanhã</button>
+                <button type="button" className="quick-btn" onClick={() => handleQuickDate('proxima-semana')}>Próxima Semana</button>
+              </div>
+
+              {showDateWarning && (
+                <div className="realtime-error">
+                  ⚠ A data final deve ser posterior à data de início.
+                </div>
+              )}
+
+              <label htmlFor="local-select">
                 Local ou link
+              </label>
+              <select
+                id="local-select"
+                value={localOption}
+                onChange={(e) => setLocalOption(e.target.value)}
+              >
+                <option value="Sala 301">Sala 301</option>
+                <option value="Sala 302">Sala 302</option>
+                <option value="Google Meet">Google Meet</option>
+                <option value="custom">Outro local ou link...</option>
+              </select>
+
+              {localOption === 'custom' && (
                 <input
                   name="local_ou_link"
                   value={form.local_ou_link}
                   onChange={handleChange}
-                  placeholder="Ex: Sala 302 ou link Google Meet"
+                  placeholder="Digite a sala ou link do Google Meet"
                   required
+                  style={{ marginTop: '-8px' }}
                 />
-              </label>
+              )}
+
+              {localConflict && (
+                <div className="realtime-warning">
+                  ⚠ Atenção: Já existe banca agendada neste local/link com horário sobreposto.
+                </div>
+              )}
 
               {formError && <p className="agendamento-alert error" role="alert">{formError}</p>}
               {formSuccess && <p className="agendamento-alert success" role="status">{formSuccess}</p>}
 
               <button className="agendamento-primary" type="submit" disabled={saving}>
-                {saving ? 'Agendando...' : 'Agendar banca'}
+                {saving ? (
+                  <>
+                    <span className="spinner" />
+                    Agendando...
+                  </>
+                ) : 'Agendar banca'}
               </button>
             </div>
           </form>
@@ -343,7 +551,7 @@ export default function AgendamentoBancaPage() {
             {/* Painel de Busca e Filtros */}
             <div className="agendamento-filter-panel">
               <div className="filter-field filter-field-text">
-                <label htmlFor="filter-tema-input">Buscar por tema ou local</label>
+                <label htmlFor="filter-tema-input">🔍 Buscar banca (Tema/Local)</label>
                 <div className="filter-input-with-icon">
                   <input
                     id="filter-tema-input"
@@ -356,7 +564,7 @@ export default function AgendamentoBancaPage() {
               </div>
 
               <div className="filter-field filter-field-date">
-                <label htmlFor="filter-inicio-input">Período de início</label>
+                <label htmlFor="filter-inicio-input">📅 Período (Início)</label>
                 <input
                   id="filter-inicio-input"
                   type="datetime-local"
@@ -366,7 +574,7 @@ export default function AgendamentoBancaPage() {
               </div>
 
               <div className="filter-field filter-field-date">
-                <label htmlFor="filter-fim-input">Período até</label>
+                <label htmlFor="filter-fim-input">📅 Período (Fim)</label>
                 <input
                   id="filter-fim-input"
                   type="datetime-local"
@@ -444,50 +652,72 @@ export default function AgendamentoBancaPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {filteredAgendamentos.map((item) => (
-                          <tr key={item.id}>
-                            <td>{item.tema_tcc_id}</td>
-                            <td>{formatDateTime(item.data_hora_inicio)}</td>
-                            <td>{formatDateTime(item.data_hora_fim)}</td>
-                            <td>
-                              {item.local_ou_link.startsWith('http') ? (
-                                <a href={item.local_ou_link} target="_blank" rel="noopener noreferrer" className="ifam-link-externo">
-                                  Acessar link
-                                </a>
-                              ) : (
-                                item.local_ou_link
-                              )}
-                            </td>
-                            <td>
-                              {confirmDeleteId === item.id ? (
-                                <div className="agendamento-confirm-group">
-                                  <button
-                                    className="agendamento-danger agendamento-confirm-btn"
-                                    type="button"
-                                    onClick={() => handleCancel(item.id)}
-                                  >
-                                    Confirmar
-                                  </button>
-                                  <button
-                                    className="agendamento-secondary agendamento-cancel-btn"
-                                    type="button"
-                                    onClick={() => setConfirmDeleteId(null)}
-                                  >
-                                    Desistir
-                                  </button>
+                        {filteredAgendamentos.map((item) => {
+                          const isPresencial = item.local_ou_link.toLowerCase().includes('sala');
+                          const isOnline = item.local_ou_link.toLowerCase().startsWith('http') || item.local_ou_link.toLowerCase().includes('meet') || item.local_ou_link.toLowerCase().includes('zoom');
+                          const isHoje = new Date(item.data_hora_inicio).toDateString() === new Date().toDateString();
+                          const isConflict = conflictsSet.has(item.id);
+
+                          return (
+                            <tr key={item.id}>
+                              <td>{item.tema_tcc_id}</td>
+                              <td>{formatDateTime(item.data_hora_inicio)}</td>
+                              <td>{formatDateTime(item.data_hora_fim)}</td>
+                              <td>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-start' }}>
+                                  {item.local_ou_link.startsWith('http') ? (
+                                    <a href={item.local_ou_link} target="_blank" rel="noopener noreferrer" className="ifam-link-externo">
+                                      Acessar link
+                                    </a>
+                                  ) : (
+                                    <span>{item.local_ou_link}</span>
+                                  )}
+                                  <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '2px' }}>
+                                    {isPresencial && <span className="banca-badge presencial">🟢 Presencial</span>}
+                                    {isOnline && <span className="banca-badge online">🔵 Online</span>}
+                                    {isHoje && <span className="banca-badge hoje">🟠 Hoje</span>}
+                                    {isConflict && <span className="banca-badge conflito" title="Sobreposição de horário e local com outra defesa">🔴 Conflito</span>}
+                                  </div>
                                 </div>
-                              ) : (
-                                <button
-                                  className="agendamento-danger"
-                                  type="button"
-                                  onClick={() => setConfirmDeleteId(item.id)}
-                                >
-                                  Cancelar
-                                </button>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
+                              </td>
+                              <td>
+                                {confirmDeleteId === item.id ? (
+                                  <div className="agendamento-confirm-group">
+                                    <button
+                                      className="agendamento-danger agendamento-confirm-btn"
+                                      type="button"
+                                      disabled={cancellingId === item.id}
+                                      onClick={() => handleCancel(item.id)}
+                                    >
+                                      {cancellingId === item.id ? (
+                                        <>
+                                          <span className="spinner" />
+                                          Confirmando...
+                                        </>
+                                      ) : 'Confirmar'}
+                                    </button>
+                                    <button
+                                      className="agendamento-secondary agendamento-cancel-btn"
+                                      type="button"
+                                      disabled={cancellingId === item.id}
+                                      onClick={() => setConfirmDeleteId(null)}
+                                    >
+                                      Desistir
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <button
+                                    className="agendamento-danger"
+                                    type="button"
+                                    onClick={() => setConfirmDeleteId(item.id)}
+                                  >
+                                    Cancelar
+                                  </button>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
@@ -497,6 +727,44 @@ export default function AgendamentoBancaPage() {
           </section>
         </section>
       </main>
+
+      {/* Modal de Ajuda */}
+      {helpOpen && (
+        <div className="agendamento-modal-overlay" onClick={() => setHelpOpen(false)}>
+          <div className="agendamento-modal-box" onClick={(e) => e.stopPropagation()}>
+            <div className="agendamento-modal-header">
+              <h3>Como agendar uma banca</h3>
+              <button className="agendamento-modal-close" onClick={() => setHelpOpen(false)}>×</button>
+            </div>
+            <div className="agendamento-modal-body">
+              <p>Siga o passo a passo abaixo para registrar um agendamento de banca de TCC:</p>
+              <ol>
+                <li><strong>Informe o ID do Tema:</strong> Insira o UUID correspondente ao tema do TCC. O tema deve estar previamente cadastrado e possuir parecer favorável do orientador.</li>
+                <li><strong>Selecione o Horário:</strong> Escolha a data/hora de início e de término. Use os atalhos rápidos (Hoje, Amanhã, Próxima Semana) para facilitar o preenchimento.</li>
+                <li><strong>Defina o Local ou Link:</strong> Escolha uma das salas físicas (Sala 301, Sala 302), link do Google Meet ou selecione "Outro" para digitar uma descrição customizada.</li>
+                <li><strong>Evite Conflitos:</strong> O sistema validará em tempo real se a sala escolhida já está ocupada no horário selecionado. Caso esteja, altere a sala ou o horário.</li>
+                <li><strong>Finalize:</strong> Clique em "Agendar banca". Você receberá uma notificação de sucesso e o agendamento aparecerá na tabela.</li>
+              </ol>
+              <h4>⚠️ Regras Importantes</h4>
+              <ul>
+                <li>A data final deve ser obrigatoriamente posterior à data inicial.</li>
+                <li>O tema informado deve ter parecer favorável de aptidão para defesa registrado pelo orientador.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Notificações Toasts */}
+      <div className="agendamento-toasts">
+        {toasts.map((t) => (
+          <div key={t.id} className={`toast-item ${t.type}`}>
+            <span className="toast-icon">{t.type === 'success' ? '✅' : '❌'}</span>
+            <div className="toast-content">{t.message}</div>
+            <button className="toast-close" onClick={() => setToasts((prev) => prev.filter((item) => item.id !== t.id))}>×</button>
+          </div>
+        ))}
+      </div>
 
       {/* Rodapé Institucional */}
       <footer className="ifam-footer">
