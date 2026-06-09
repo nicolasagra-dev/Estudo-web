@@ -1,7 +1,7 @@
 .agendamento-page {
   --cor-verde-marca: #2f9e41; /* Verde oficial IF */
   --cor-vermelho-marca: #cd191e; /* Vermelho oficial IF */
-  --verde-principal: #135846; /* Verde institucional escuro */
+  --verde-principal: #135846; /* Verde de apoio com contraste para interface */
   --verde-hover: #0c4335;
   --verde-claro: #eef7f4;
   --verde-focus: rgba(47, 158, 65, 0.15);
@@ -15,7 +15,7 @@
   --vermelho-claro: #fdf2f2;
   --sombra-card: 0 4px 12px rgba(0, 0, 0, 0.03), 0 8px 24px rgba(0, 0, 0, 0.05);
   --sombra-botao: 0 4px 12px rgba(19, 88, 70, 0.15);
-  --raio-card: 12px;
+  --raio-card: 8px;
   --raio-input: 8px;
   --raio-botao: 8px;
   --transicao: 200ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -25,7 +25,7 @@
   padding: 0 0 64px;
   background: var(--fundo);
   color: var(--texto-principal);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Open Sans', Arial, sans-serif;
 }
 
 /* --- CABEÇALHO INSTITUCIONAL IFAM --- */
@@ -39,7 +39,7 @@
   max-width: 1650px;
   width: 95%;
   margin: 0 auto;
-  padding: 10px 40px;
+  padding: 14px 40px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -51,10 +51,41 @@
 .ifam-logo-container {
   display: flex;
   align-items: center;
+  padding: 8px 12px;
+  background: var(--branco);
 }
 
 .ifam-logo-svg {
   display: block;
+  width: min(360px, 100%);
+  height: auto;
+  flex: 0 0 auto;
+}
+
+.ifam-logo-lettering {
+  font-family: 'Open Sans', Arial, sans-serif;
+  fill: #000000;
+  letter-spacing: 0;
+}
+
+.ifam-logo-title-line {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.ifam-logo-institute {
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.ifam-logo-divider {
+  stroke: #2f9e41;
+  stroke-width: 1.5;
+}
+
+.ifam-logo-campus {
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .ifam-system-title {
@@ -69,11 +100,11 @@
   font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0;
   color: var(--verde-principal);
   background: var(--verde-claro);
   padding: 4px 10px;
-  border-radius: 20px;
+  border-radius: 8px;
   margin-bottom: 6px;
   border: 1px solid rgba(47, 158, 65, 0.18);
 }
@@ -83,7 +114,7 @@
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--texto-principal);
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
 }
 
 .ifam-nav {
@@ -200,7 +231,7 @@
   background: var(--verde-claro);
   font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0;
   text-transform: uppercase;
   padding: 4px 10px;
   border-radius: 4px;
@@ -213,7 +244,7 @@
   font-weight: 700;
   line-height: 1.25;
   color: var(--texto-principal);
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
 }
 
 .agendamento-subtitle {
@@ -444,7 +475,7 @@
   font-weight: 700;
   color: var(--texto-secundario);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0;
 }
 
 .filter-field input {
@@ -509,7 +540,7 @@
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0;
   white-space: nowrap;
 }
 
@@ -612,7 +643,7 @@
   font-weight: 700;
   color: var(--branco);
   margin: 0 0 12px;
-  letter-spacing: 0.02em;
+  letter-spacing: 0;
 }
 
 .ifam-footer-brand p {
@@ -635,7 +666,7 @@
   color: var(--branco);
   margin: 0 0 16px;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
 }
 
 .ifam-footer-contacts p,
@@ -689,6 +720,26 @@
   .ifam-system-title {
     align-items: flex-start;
     text-align: left;
+  }
+
+  .ifam-logo-container {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .ifam-logo-svg {
+    max-width: 360px;
+  }
+
+  .ifam-nav-content {
+    flex-wrap: wrap;
+    gap: 0;
+  }
+
+  .ifam-nav-link {
+    flex: 0 0 50%;
+    padding: 10px 8px;
+    text-align: center;
   }
   
   .agendamento-grid {
@@ -763,7 +814,7 @@
 .stat-label {
   font-size: 0.74rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0;
   color: var(--texto-secundario);
   font-weight: 700;
 }
@@ -772,7 +823,7 @@
   font-size: 1.25rem;
   font-weight: 800;
   color: var(--texto-principal);
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
 }
 
 .stat-subtext {
@@ -790,7 +841,7 @@
   padding: 3px 6px;
   border-radius: 4px;
   text-transform: uppercase;
-  letter-spacing: 0.02em;
+  letter-spacing: 0;
   white-space: nowrap;
 }
 
@@ -1240,4 +1291,3 @@
   background-color: currentColor;
   margin-right: 2px;
 }
-

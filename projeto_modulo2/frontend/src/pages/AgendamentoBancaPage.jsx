@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import {
   cancelarAgendamento,
@@ -11,7 +11,7 @@ const initialForm = {
   tema_tcc_id: '',
   data_hora_inicio: '',
   data_hora_fim: '',
-  local_ou_link: '',
+  local_ou_link: 'Sala 301',
 }
 
 function formatDateTime(value) {
@@ -53,6 +53,48 @@ function getApiError(error) {
     .join(' ')
 }
 
+function InstitutoFederalLogo() {
+  const moduleSize = 20
+  const gap = moduleSize * 0.2
+  const radius = moduleSize * 0.1
+  const circleRadius = moduleSize * 0.55
+
+  return (
+    <svg
+      className="ifam-logo-svg"
+      viewBox="0 0 360 128"
+      width="360"
+      height="128"
+      role="img"
+      aria-labelledby="ifam-logo-title"
+    >
+      <title id="ifam-logo-title">Instituto Federal Amazonas - Campus Manaus Zona Leste</title>
+      <g transform="translate(12, 12)">
+        <circle cx={moduleSize / 2} cy={moduleSize / 2} r={circleRadius} fill="#cd191e" />
+        <rect x="0" y={moduleSize + gap} width={moduleSize} height={moduleSize} fill="#2f9e41" rx={radius} />
+        <rect x="0" y={(moduleSize + gap) * 2} width={moduleSize} height={moduleSize} fill="#2f9e41" rx={radius} />
+        <rect x="0" y={(moduleSize + gap) * 3} width={moduleSize} height={moduleSize} fill="#2f9e41" rx={radius} />
+
+        <rect x={moduleSize + gap} y="0" width={moduleSize} height={moduleSize} fill="#2f9e41" rx={radius} />
+        <rect x={moduleSize + gap} y={moduleSize + gap} width={moduleSize} height={moduleSize} fill="#2f9e41" rx={radius} />
+        <rect x={moduleSize + gap} y={(moduleSize + gap) * 2} width={moduleSize} height={moduleSize} fill="#2f9e41" rx={radius} />
+        <rect x={moduleSize + gap} y={(moduleSize + gap) * 3} width={moduleSize} height={moduleSize} fill="#2f9e41" rx={radius} />
+
+        <rect x={(moduleSize + gap) * 2} y="0" width={moduleSize} height={moduleSize} fill="#2f9e41" rx={radius} />
+        <rect x={(moduleSize + gap) * 2} y={(moduleSize + gap) * 2} width={moduleSize} height={moduleSize} fill="#2f9e41" rx={radius} />
+      </g>
+
+      <g className="ifam-logo-lettering" transform="translate(104, 20)">
+        <text x="0" y="22" className="ifam-logo-title-line">INSTITUTO</text>
+        <text x="0" y="46" className="ifam-logo-title-line">FEDERAL</text>
+        <text x="0" y="68" className="ifam-logo-institute">Amazonas</text>
+        <line x1="0" y1="80" x2="178" y2="80" className="ifam-logo-divider" />
+        <text x="0" y="102" className="ifam-logo-campus">Campus Manaus Zona Leste</text>
+      </g>
+    </svg>
+  )
+}
+
 export default function AgendamentoBancaPage() {
   const [form, setForm] = useState(initialForm)
   const [agendamentos, setAgendamentos] = useState([])
@@ -69,6 +111,7 @@ export default function AgendamentoBancaPage() {
   const [toasts, setToasts] = useState([])
   const [helpOpen, setHelpOpen] = useState(false)
   const [localOption, setLocalOption] = useState('Sala 301')
+  const toastIdRef = useRef(0)
 
   // Estados para busca e filtragem
   const [filterTema, setFilterTema] = useState('')
@@ -79,21 +122,22 @@ export default function AgendamentoBancaPage() {
 
   // Auxiliar para adicionar Toasts
   const addToast = (message, type = 'success') => {
-    const id = Date.now()
+    toastIdRef.current += 1
+    const id = toastIdRef.current
     setToasts((prev) => [...prev, { id, message, type }])
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id))
     }, 4000)
   }
 
-  // Sincroniza localOption com form.local_ou_link
-  useEffect(() => {
-    if (localOption !== 'custom') {
-      setForm((current) => ({ ...current, local_ou_link: localOption }))
-    } else {
-      setForm((current) => ({ ...current, local_ou_link: '' }))
-    }
-  }, [localOption])
+  function handleLocalOptionChange(event) {
+    const nextLocalOption = event.target.value
+    setLocalOption(nextLocalOption)
+    setForm((current) => ({
+      ...current,
+      local_ou_link: nextLocalOption === 'custom' ? '' : nextLocalOption,
+    }))
+  }
 
   // Estatísticas do portal
   const stats = useMemo(() => {
@@ -333,38 +377,7 @@ export default function AgendamentoBancaPage() {
       <header className="ifam-header">
         <div className="ifam-header-top">
           <div className="ifam-logo-container">
-            <svg viewBox="0 0 200 230" width="115" height="132" className="ifam-logo-svg">
-              <g transform="translate(66, 10)">
-                {/* Coluna 1 (i) */}
-                {/* Círculo vermelho: dimensão 10% maior que o quadrado x (20px). Logo, diâmetro=22, raio=11. Centrado em cx=10, cy=10 */}
-                <circle cx="10" cy="10" r="11" fill="#cd191e" />
-                <rect x="0" y="24" width="20" height="20" fill="#2f9e41" rx="2" />
-                <rect x="0" y="48" width="20" height="20" fill="#2f9e41" rx="2" />
-                <rect x="0" y="72" width="20" height="20" fill="#2f9e41" rx="2" />
-                
-                {/* Coluna 2 (f-haste) - Posição x = 24 (Col 1 + gap = 20 + 4 = 24) */}
-                <rect x="24" y="0" width="20" height="20" fill="#2f9e41" rx="2" />
-                <rect x="24" y="24" width="20" height="20" fill="#2f9e41" rx="2" />
-                <rect x="24" y="48" width="20" height="20" fill="#2f9e41" rx="2" />
-                <rect x="24" y="72" width="20" height="20" fill="#2f9e41" rx="2" />
-                
-                {/* Coluna 3 (f-barras) - Posição x = 48 (Col 2 + gap = 24 + 4 + 20 = 48) */}
-                {/* O manual de marca mostra a barra de cima na linha 1 (y=0) e a do meio na linha 3 (y=48) */}
-                <rect x="48" y="0" width="20" height="20" fill="#2f9e41" rx="2" />
-                <rect x="48" y="48" width="20" height="20" fill="#2f9e41" rx="2" />
-              </g>
-              
-              {/* Assinatura vertical centralizada */}
-              <text x="100" y="122" fontFamily="'Open Sans', sans-serif" fontSize="16" fontWeight="800" fill="#000000" textAnchor="middle" letterSpacing="-0.02em">INSTITUTO</text>
-              <text x="100" y="142" fontFamily="'Open Sans', sans-serif" fontSize="16" fontWeight="800" fill="#000000" textAnchor="middle" letterSpacing="-0.02em">FEDERAL</text>
-              <text x="100" y="160" fontFamily="'Open Sans', sans-serif" fontSize="13" fontWeight="600" fill="#000000" textAnchor="middle">Amazonas</text>
-              
-              {/* Linha divisória verde */}
-              <line x1="50" y1="172" x2="150" y2="172" stroke="#2f9e41" strokeWidth="1.5" />
-              
-              <text x="100" y="190" fontFamily="'Open Sans', sans-serif" fontSize="12" fontWeight="400" fill="#000000" textAnchor="middle">Campus</text>
-              <text x="100" y="208" fontFamily="'Open Sans', sans-serif" fontSize="12" fontWeight="700" fill="#000000" textAnchor="middle">Manaus Zona Leste</text>
-            </svg>
+            <InstitutoFederalLogo />
           </div>
           
           <div className="ifam-system-title">
@@ -542,7 +555,7 @@ export default function AgendamentoBancaPage() {
               <select
                 id="local-select"
                 value={localOption}
-                onChange={(e) => setLocalOption(e.target.value)}
+                onChange={handleLocalOptionChange}
               >
                 <option value="Sala 301">Sala 301</option>
                 <option value="Sala 302">Sala 302</option>
