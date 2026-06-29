@@ -1,3 +1,520 @@
+# DOCUMENTAÇÃO COMPLETA: SISTEMA DE GESTÃO DE TCC (BANCAS DE DEFESA) - IFAM
+
+Este documento reúne todas as informações técnicas, estruturais, conceituais e o código fonte comentado de forma 100% unificada. É o guia definitivo do projeto para apresentação acadêmica, desenvolvimento e implantação.
+
+---
+
+## 📋 SEÇÃO 1: CONTEXTO E FLUXO DE EXECUÇÃO DO PROJETO
+
+### 1.1 Visão Geral do Sistema
+*   **Instituição:** Instituto Federal do Amazonas (IFAM) - Campus Manaus Zona Leste.
+*   **Finalidade:** Interface acadêmica para agendamento de bancas de defesa de TCC (Trabalhos de Conclusão de Curso). O sistema permite visualizar bancas cadastradas, registrar novas defesas (com ID do Tema de TCC, datas/horas de início e fim, e local ou link) e realizar cancelamentos.
+*   **Restrições e Condições de Laboratório (Faculdade):**
+    *   O computador de destino (faculdade) roda Windows, com **Python 3.10.11** e **PostgreSQL**.
+    *   **Sem privilégios de administrador** (bloqueio do PowerShell para scripts `.ps1`).
+    *   **Sem Node.js/npm** instalados no laboratório local.
+    *   **Sem internet de alta velocidade** (necessidade de dependências instaladas em venv local e frontend pré-compilado na pasta `/frontend/dist`).
+
+---
+
+## ⚙️ SEÇÃO 2: GUIA DE TECNOLOGIAS ADOTADAS (STACK)
+
+O projeto utiliza uma arquitetura descentralizada (decoupled), na qual o **Front-end** e o **Back-end** são totalmente separados, comunicando-se exclusivamente através de requisições HTTP (API REST) e troca de dados no formato **JSON**.
+
+```mermaid
+graph LR
+    A[Front-end: React + Vite] -- Requisições HTTP / JSON --> B[Back-end: Django REST Framework]
+    B -- Consultas ORM --> C[(Banco: PostgreSQL)]
+```
+
+### 2.1 Tecnologias do Front-end
+
+#### **React**
+*   **O que é:** Biblioteca JavaScript declarativa baseada em componentes para a construção de interfaces de usuário.
+*   **Motivos da Escolha:**
+    *   **Componentização:** Permite dividir a tela em pedaços isolados e reutilizáveis (botão de cancelar, cabeçalho do IFAM, cards, formulário), facilitando a colaboração simultânea dos membros da equipe.
+    *   **Estado Declarativo (Hooks):** Hooks como `useState` e `useEffect` permitem que a tela reaja automaticamente a alterações de dados sem necessidade de manipulação direta do DOM.
+    *   **Virtual DOM:** Garante performance otimizada, atualizando em tela apenas os elementos cujo estado foi alterado.
+
+#### **Vite**
+*   **O que é:** Ferramenta de build rápida para empacotamento e desenvolvimento front-end moderno.
+*   **Motivos da Escolha:**
+    *   **HMR (Hot Module Replacement):** Atualizações instantâneas no navegador durante o desenvolvimento sem perda do estado interno.
+    *   **Otimização do Build:** Compilação automatizada dos arquivos React para arquivos estáticos (`index.html`, JS e CSS minificados) dentro do diretório `frontend/dist/`, permitindo rodar a interface usando apenas servidores web estáticos simples (como o módulo nativo do Python).
+
+#### **React Router DOM**
+*   **O que é:** A biblioteca padrão para gerenciamento de navegação e rotas dinâmicas em aplicações React.
+*   **Motivos da Escolha:**
+    *   **SPA (Single Page Application):** Evita recarregamentos completos da página no navegador, proporcionando transições fluidas e experiência de aplicação nativa de desktop.
+
+#### **Axios**
+*   **O que é:** Um cliente HTTP baseado em Promessas (Promises) para fazer requisições à API.
+*   **Motivos da Escolha:**
+    *   **Interceptadores de Requisição:** Configura dinamicamente tokens de autenticação (`Bearer token`) nos cabeçalhos de todas as requisições.
+    *   **Tratamento Centralizado de Erros e JSON:** Converte respostas e envia dados JSON de forma nativa e automática.
+
+### 2.2 Tecnologias do Back-end
+
+#### **Django & Django REST Framework (DRF)**
+*   **O que é:** Django é um framework Python de alto nível para desenvolvimento web ágil e seguro; o DRF é um toolkit poderoso para construção de APIs RESTful.
+*   **Motivos da Escolha:**
+    *   **Batteries-Included:** Disponibiliza ferramentas prontas para autenticação, administração (Django Admin) e segurança integrada (proteção nativa contra SQL Injection, CSRF, etc.).
+    *   **Serializers:** Facilidade na conversão de tipos complexos (como models) para JSON e validação estruturada e segura de dados.
+    *   **Django ORM:** Camada de abstração do banco de dados que permite interagir com tabelas por meio de classes Python.
+
+#### **Simple JWT (Autenticação JSON Web Token)**
+*   **O que é:** Mecanismo de autenticação de chaves sem estado (stateless) para APIs web.
+*   **Motivos da Escolha:**
+    *   Dispensa o armazenamento de sessões no servidor de banco de dados. Os tokens contêm as credenciais do usuário criptografadas, sendo renovadas periodicamente.
+
+#### **Django CORS Headers**
+*   **O que é:** Middleware para gerenciamento de CORS (Cross-Origin Resource Sharing).
+*   **Motivos da Escolha:**
+    *   Permite a comunicação segura entre o frontend que roda em um domínio/porta (`http://localhost:5173`) e o backend em outro (`http://127.0.0.1:8000`).
+
+### 2.3 Banco de Dados
+
+#### **PostgreSQL**
+*   **O que é:** Sistema gerenciador de banco de dados relacional de código aberto, robusto e extensível.
+*   **Motivos da Escolha:**
+    *   **Confiabilidade (Transações ACID):** Garante integridade absoluta dos dados acadêmicos.
+    *   **Uso de UUIDs:** Suporte nativo ao tipo UUID para identificação exclusiva de registros sem expor IDs sequenciais nas URLs públicas do sistema.
+
+---
+
+## 🏛️ SEÇÃO 3: ARQUITETURA, POO E DESIGN PATTERNS APLICADOS
+
+### 3.1 Arquitetura de Software
+
+*   **Arquitetura Decoupled (Cliente-Servidor):** Total separação de responsabilidades. O Frontend se preocupa com a experiência visual e a acessibilidade, enquanto o Backend executa regras de negócio, persistência e validação.
+*   **Arquitetura RESTful:** Comunicação sem estado baseada em recursos HTTP mapeados por métodos padronizados (GET para consultas, POST para criação, PATCH para atualizações parciais, DELETE para remoções).
+*   **Componentização e Estado Reativo (Frontend):** Layout dividido em blocos de componentes independentes e reativos que observam modificações em variáveis de estado.
+
+### 3.2 Programação Orientada a Objetos (POO) no Backend
+
+*   **Herança (Inheritance):** 
+    *   A classe `AgendamentoBanca` herda de `models.Model` do Django, herdando automaticamente métodos complexos de persistência (`.save()`, `.delete()`) e gerenciamento de queries (`.objects`).
+    *   A view `AgendamentoBancaViewSet` herda de `viewsets.ModelViewSet`, adquirindo a implementação completa das cinco operações do padrão CRUD por herança.
+*   **Polimorfismo (Polymorphism):**
+    *   Sobrescrita de métodos (**Method Overriding**). Exemplo: implementação customizada de `__str__(self)` nas classes de modelo e do método `clean(self)` para adicionar regras personalizadas de colisão de salas adicionadas ao ciclo de validação padrão do framework.
+*   **Encapsulamento (Encapsulation):**
+    *   Uso do ORM do Django. Os comandos SQL puros são encapsulados por completo. Desenvolvedores interagem com objetos e métodos Python seguros, mantendo o banco de dados isolado de manipulações manuais diretas.
+
+### 3.3 Padrões de Projeto (Design Patterns)
+
+*   **Active Record (Padrão de ORM):**
+    *   Uma tabela no banco de dados é representada diretamente por uma classe (Model) e cada linha da tabela corresponde a uma instância deste objeto. Os dados e os comportamentos de persistência residem na mesma estrutura.
+*   **Facade (Fachada):**
+    *   Implementado na camada de serviços do frontend (`agendamentoBanca.service.js`). A página de interface (`AgendamentoBancaPage.jsx`) não interage diretamente com chamadas HTTP complexas do Axios, cabeçalhos ou endpoints específicos. Ela apenas invoca funções simplificadas como `criarAgendamento(payload)` que ocultam essa complexidade.
+*   **Singleton (Instância Única):**
+    *   Implementado no arquivo de conexão `api.js`. Garante que apenas uma instância única do cliente Axios seja instanciada para toda a aplicação, concentrando a URL base, timeout e interceptadores de requisição em uma conexão única.
+*   **Observer / Reactor (Padrão Reativo):**
+    *   Utilizado pelo motor do React (`useState` e `useEffect`). Elementos visuais agem como observadores de variáveis de estado. Ao invocar modificadores de estado, o motor detecta a alteração e atualiza automaticamente os elementos visuais vinculados sem intervenção direta do desenvolvedor no DOM HTML.
+
+---
+
+## 🐍 SEÇÃO 4: CÓDIGO FONTE COMENTADO DO BACKEND (PYTHON / DJANGO)
+
+### 4.1 Modelos do Banco de Dados (`gestao_tcc/models.py`)
+
+```python
+import uuid
+from django.core.exceptions import ValidationError
+from django.db import models
+from django.db.models import F, Q
+
+# -------------------------------------------------------------------
+# MODELO ALUNO
+# -------------------------------------------------------------------
+class Aluno(models.Model):
+    # UUIDField garante chaves primárias alfanuméricas aleatórias para evitar adivinhação de IDs por terceiros.
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    nome_completo = models.CharField(max_length=150)
+    # unique=True impede duplicidade de registros de matrículas ou e-mails no banco de dados.
+    matricula = models.CharField(max_length=20, unique=True)
+    email = models.EmailField(max_length=100, unique=True)
+    senha_hash = models.CharField(max_length=255)
+    curso = models.CharField(max_length=100)
+
+    class Meta:
+        db_table = "aluno"  # Nome exato da tabela criada no PostgreSQL/SQLite
+        ordering = ["nome_completo"]  # Ordena automaticamente buscas de registros por ordem alfabética
+
+    def __str__(self):
+        # Exibição textual amigável do objeto, útil para o console e o painel administrativo do Django.
+        return self.nome_completo
+
+
+# -------------------------------------------------------------------
+# MODELO TEMA DE TCC
+# -------------------------------------------------------------------
+class TemaTcc(models.Model):
+    # Constantes estáticas para representação de estados de aprovação.
+    STATUS_PENDENTE = "Pendente"
+    STATUS_APROVADO = "Aprovado"
+    STATUS_REJEITADO = "Rejeitado"
+
+    STATUS_CHOICES = [
+        (STATUS_PENDENTE, "Pendente"),
+        (STATUS_APROVADO, "Aprovado"),
+        (STATUS_REJEITADO, "Rejeitado"),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # ForeignKey representa um relacionamento 1-para-N (um aluno pode ter vários temas de TCC).
+    # models.CASCADE: apaga todos os temas atrelados se o registro do aluno correspondente for excluído.
+    aluno = models.ForeignKey(Aluno, on_delete=models.CASCADE, related_name="temas_tcc")
+    titulo = models.CharField(max_length=255)
+    resumo = models.TextField()
+    status = models.CharField(
+        max_length=30,
+        choices=STATUS_CHOICES,
+        default=STATUS_PENDENTE,
+    )
+    # auto_now_add=True captura automaticamente o momento exato do registro na criação.
+    data_submissao = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "tema_tcc"
+        ordering = ["-data_submissao"]  # Ordenação decrescente (da submissão mais recente para a mais antiga)
+
+    def __str__(self):
+        return self.titulo
+
+
+# -------------------------------------------------------------------
+# MODELO VERSÃO TRABALHO
+# -------------------------------------------------------------------
+class VersaoTrabalho(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    tema_tcc = models.ForeignKey(TemaTcc, on_delete=models.CASCADE, related_name="versoes_trabalho")
+    arquivo_url = models.CharField(max_length=255)
+    versao = models.IntegerField(default=1)
+    data_envio = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "versao_trabalho"
+        ordering = ["-data_envio"]
+
+    def __str__(self):
+        return f"{self.tema_tcc.titulo} - V{self.versao}"
+
+
+# -------------------------------------------------------------------
+# MODELO PARECER ORIENTADOR
+# -------------------------------------------------------------------
+class ParecerOrientador(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    versao = models.ForeignKey(VersaoTrabalho, on_delete=models.CASCADE, related_name="pareceres")
+    comentario = models.TextField()
+    apto_banca = models.BooleanField(default=False)
+    data_parecer = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "parecer_orientador"
+
+    def __str__(self):
+        return f"Parecer sobre V{self.versao.versao}: {'Apto' if self.apto_banca else 'Inapto'}"
+
+
+# -------------------------------------------------------------------
+# MODELO AGENDAMENTO DE BANCA
+# -------------------------------------------------------------------
+class AgendamentoBanca(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    
+    # OneToOneField: Garante relacionamento 1-para-1 (cada tema de TCC possui exclusivamente um agendamento de banca).
+    # models.PROTECT: Impede a exclusão acidental de um tema de TCC se houver uma banca agendada para ele.
+    tema_tcc = models.OneToOneField(
+        TemaTcc,
+        on_delete=models.PROTECT,
+        related_name="agendamento_banca",
+    )
+    data_hora_inicio = models.DateTimeField()
+    data_hora_fim = models.DateTimeField()
+    local_ou_link = models.CharField(max_length=255)
+
+    class Meta:
+        db_table = "agendamento_banca"
+        ordering = ["data_hora_inicio"]
+        # Índices aceleram a velocidade de consultas SQL executadas pelo ORM em campos filtrados constantemente.
+        indexes = [
+            models.Index(fields=["local_ou_link", "data_hora_inicio", "data_hora_fim"]),
+            models.Index(fields=["data_hora_inicio"]),
+        ]
+        # CheckConstraints garantem travas a nível de banco de dados (ex: impede data final anterior à inicial).
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(data_hora_fim__gt=F("data_hora_inicio")),
+                name="agendamento_banca_fim_apos_inicio",
+            ),
+        ]
+
+    def clean(self):
+        """
+        Executa as validações lógicas e regras de negócio antes dos dados serem salvos no banco.
+        """
+        super().clean()  # Chama as validações padrão do Django
+
+        if self.data_hora_inicio and self.data_hora_fim:
+            # Validação 1: Bloqueia caso o término da banca ocorra antes ou no exato instante do início.
+            if self.data_hora_fim <= self.data_hora_inicio:
+                raise ValidationError(
+                    {"data_hora_fim": "A data/hora final deve ser posterior ao inicio."}
+                )
+
+            # Validação 2: Verificação de sobreposição/conflito de salas ou links no mesmo horário.
+            # Localiza agendamentos no banco com o mesmo local/link (sem diferenciar maiúsculas/minúsculas)
+            # onde a janela de tempo se sobreponha (início menor que o nosso fim E término maior que o nosso início).
+            conflito = AgendamentoBanca.objects.filter(
+                local_ou_link__iexact=self.local_ou_link.strip(),
+                data_hora_inicio__lt=self.data_hora_fim,
+                data_hora_fim__gt=self.data_hora_inicio,
+            )
+
+            # Se for uma atualização (objeto já existente), exclui ele mesmo da consulta de colisão de horários.
+            if self.pk:
+                conflito = conflito.exclude(pk=self.pk)
+
+            # Caso haja registros na lista retornada, levanta um erro de validação.
+            if conflito.exists():
+                raise ValidationError(
+                    {
+                        "local_ou_link": (
+                            "Ja existe uma banca agendada neste local/link "
+                            "com horario sobreposto."
+                        )
+                    }
+                )
+
+    def __str__(self):
+        return f"{self.tema_tcc_id} - {self.local_ou_link} - {self.data_hora_inicio}"
+```
+
+### 4.2 Serializadores da API (`gestao_tcc/serializers.py`)
+
+```python
+from rest_framework import serializers
+from .models import AgendamentoBanca, ParecerOrientador, TemaTcc
+
+class AgendamentoBancaSerializer(serializers.ModelSerializer):
+    # Vincula o campo recebido "tema_tcc_id" à query de busca de objetos no modelo TemaTcc.
+    tema_tcc_id = serializers.PrimaryKeyRelatedField(
+        queryset=TemaTcc.objects.all(),
+        source="tema_tcc",
+    )
+
+    class Meta:
+        model = AgendamentoBanca
+        fields = [
+            "id",
+            "tema_tcc_id",
+            "data_hora_inicio",
+            "data_hora_fim",
+            "local_ou_link",
+        ]
+        # read_only_fields: impede o frontend de tentar definir ou alterar o ID UUID que é controlado pelo servidor.
+        read_only_fields = ["id"]
+
+    def validate_local_ou_link(self, value):
+        # Remove espaços desnecessários nas pontas do texto de entrada.
+        local = value.strip()
+        if not local:
+            raise serializers.ValidationError("Informe a sala fisica ou link da banca.")
+        return local
+
+    def validate(self, attrs):
+        """
+        Validações estruturais e de integridade lógica executadas durante a conversão do JSON para objeto Python.
+        """
+        instance = self.instance  # Pega o registro atual caso seja uma edição (PATCH/PUT)
+
+        # Captura os dados novos do payload JSON ou mantém os atuais se o campo não foi modificado.
+        tema_tcc = attrs.get("tema_tcc", getattr(instance, "tema_tcc", None))
+        data_hora_inicio = attrs.get("data_hora_inicio", getattr(instance, "data_hora_inicio", None))
+        data_hora_fim = attrs.get("data_hora_fim", getattr(instance, "data_hora_fim", None))
+        local_ou_link = attrs.get("local_ou_link", getattr(instance, "local_ou_link", ""))
+
+        # 1. Validação temporal.
+        if data_hora_inicio and data_hora_fim and data_hora_fim <= data_hora_inicio:
+            raise serializers.ValidationError({"data_hora_fim": "A data/hora final deve ser posterior ao inicio."})
+
+        # 2. Regra de Negócio: Somente temas com Parecer Favorável dos orientadores ("Apto") podem ter banca agendada.
+        if tema_tcc and not self._tema_tem_parecer_favoravel(tema_tcc):
+            raise serializers.ValidationError(
+                {"tema_tcc_id": "So e possivel agendar banca para tema com parecer favoravel do orientador."}
+            )
+
+        # 3. Validação de colisão de salas.
+        if data_hora_inicio and data_hora_fim and local_ou_link:
+            conflito = AgendamentoBanca.objects.filter(
+                local_ou_link__iexact=local_ou_link.strip(),
+                data_hora_inicio__lt=data_hora_fim,
+                data_hora_fim__gt=data_hora_inicio,
+            )
+            if instance:
+                conflito = conflito.exclude(pk=instance.pk)
+            if conflito.exists():
+                raise serializers.ValidationError(
+                    {"local_ou_link": "Ja existe uma banca agendada neste local/link com horario sobreposto."}
+                )
+
+        return attrs
+
+    def _tema_tem_parecer_favoravel(self, tema_tcc):
+        """
+        Método auxiliar privado. Verifica na tabela ParecerOrientador se há pareceres favoráveis ("apto_banca=True") 
+        relacionados a versões do TCC em análise.
+        """
+        return ParecerOrientador.objects.filter(
+            versao__tema_tcc=tema_tcc,
+            apto_banca=True,
+        ).exists()
+```
+
+### 4.3 Controladores / Views (`gestao_tcc/views.py`)
+
+```python
+from django.db import transaction
+from rest_framework import viewsets
+from rest_framework.permissions import AllowAny
+
+from .models import AgendamentoBanca
+from .serializers import AgendamentoBancaSerializer
+
+# viewsets.ModelViewSet fornece automaticamente as implementações padrão das rotas CRUD (listar, criar, atualizar, deletar).
+class AgendamentoBancaViewSet(viewsets.ModelViewSet):
+    serializer_class = AgendamentoBancaSerializer
+    permission_classes = [AllowAny]  # Configurado com acesso público por padrão para apresentações locais.
+
+    def get_queryset(self):
+        """
+        Filtra e retorna os registros de bancas cadastrados conforme parâmetros enviados nas query strings da URL.
+        """
+        # select_related realiza uma junção SQL (JOIN) na tabela TemaTcc reduzindo o número de consultas adicionais no banco.
+        queryset = AgendamentoBanca.objects.select_related("tema_tcc").all()
+
+        # Captura filtros informados nas URLs, se existirem (ex: /api/bancas/agendamento/?local=Sala 301)
+        tema_tcc_id = self.request.query_params.get("tema_tcc_id")
+        local = self.request.query_params.get("local")
+        data_inicio = self.request.query_params.get("data_inicio")
+        data_fim = self.request.query_params.get("data_fim")
+
+        # Filtros dinâmicos aplicados na query.
+        if tema_tcc_id:
+            queryset = queryset.filter(tema_tcc_id=tema_tcc_id)
+
+        if local:
+            # icontains procura a substring de forma case-insensitive (ignora maiúsculas e minúsculas).
+            queryset = queryset.filter(local_ou_link__icontains=local)
+
+        if data_inicio:
+            # gte (Greater Than or Equal): data de início maior ou igual ao parâmetro informado.
+            queryset = queryset.filter(data_hora_inicio__gte=data_inicio)
+
+        if data_fim:
+            # lte (Less Than or Equal): data de início menor ou igual ao parâmetro informado.
+            queryset = queryset.filter(data_hora_inicio__lte=data_fim)
+
+        return queryset
+
+    # @transaction.atomic: Garante atomicidade da transação. Se algo der errado no salvamento, 
+    # o banco de dados executa um rollback automático prevenindo dados parciais corrompidos.
+    @transaction.atomic
+    def perform_create(self, serializer):
+        serializer.save()
+
+    @transaction.atomic
+    def perform_update(self, serializer):
+        serializer.save()
+```
+
+### 4.4 Roteador de URLs do Backend (`gestao_tcc/urls.py`)
+
+```python
+from django.urls import include, path
+from rest_framework.routers import DefaultRouter
+from .views import AgendamentoBancaViewSet
+
+# DefaultRouter gera automaticamente os caminhos de URL HTTP da API para as Views.
+# Exemplos mapeados:
+# GET /api/bancas/agendamento/ -> Lista os agendamentos.
+# POST /api/bancas/agendamento/ -> Cadastra novo agendamento.
+# DELETE /api/bancas/agendamento/<id>/ -> Deleta agendamento pelo ID.
+router = DefaultRouter()
+router.register(
+    r"bancas/agendamento",
+    AgendamentoBancaViewSet,
+    basename="agendamento-banca",
+)
+
+urlpatterns = [
+    path("", include(router.urls)),
+]
+```
+
+---
+
+## ⚛️ SEÇÃO 5: CÓDIGO FONTE COMENTADO DO FRONTEND (REACT / AXIOS)
+
+### 5.1 Instância de Integração HTTP (`frontend/src/services/api.js`)
+
+```javascript
+import axios from 'axios'
+
+// Configura uma instância centralizada (Padrão Singleton) do cliente de conexão HTTP.
+const api = axios.create({
+  baseURL: 'http://127.0.0.1:8000/api/', // Aponta para a porta padrão configurada no servidor Django local.
+})
+
+// Interceptador configurado nas requisições. 
+// Examina se existe um token de login no armazenamento do navegador e insere automaticamente no cabeçalho Authorization.
+api.interceptors.request.use(async (config) => {
+  const token = localStorage.getItem('access_token')
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+})
+
+export default api
+```
+
+### 5.2 Camada de Serviços do Agendamento (`frontend/src/services/agendamentoBanca.service.js`)
+
+```javascript
+import api from './api'
+
+// Define o endpoint relativo do recurso no backend.
+const RESOURCE = 'bancas/agendamento/'
+
+// Busca todas as bancas enviando parâmetros opcionais de filtro na URL.
+export async function listarAgendamentos(params = {}) {
+  const { data } = await api.get(RESOURCE, { params })
+  return data
+}
+
+// Registra um novo agendamento enviando os dados informados em JSON no corpo da requisição POST.
+export async function criarAgendamento(payload) {
+  const { data } = await api.post(RESOURCE, payload)
+  return data
+}
+
+// Atualiza parcialmente informações de agendamentos pelo ID utilizando chamadas parciais PATCH.
+export async function atualizarAgendamento(id, payload) {
+  const { data } = await api.patch(`${RESOURCE}${id}/`, payload)
+  return data
+}
+
+// Remove o registro de agendamento do banco de dados disparando método DELETE no endpoint correspondente.
+export async function cancelarAgendamento(id) {
+  await api.delete(`${RESOURCE}${id}/`)
+}
+```
+
+### 5.3 Interface do Usuário (`frontend/src/pages/AgendamentoBancaPage.jsx`)
+
+```jsx
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import {
@@ -1206,3 +1723,8 @@ export default function AgendamentoBancaPage() {
     </div>
   )
 }
+
+```
+
+---
+*Fim do documento unificado. Este arquivo constitui toda a base de documentação de tecnologias, conceitos de engenharia de software e código-fonte documentado do módulo.*

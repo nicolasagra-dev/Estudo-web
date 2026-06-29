@@ -1,20 +1,20 @@
 .agendamento-page {
   --cor-verde-marca: #2f9e41; /* Verde oficial IF */
   --cor-vermelho-marca: #cd191e; /* Vermelho oficial IF */
-  --verde-principal: #135846; /* Verde de apoio com contraste para interface */
-  --verde-hover: #0c4335;
-  --verde-claro: #eef7f4;
-  --verde-focus: rgba(47, 158, 65, 0.15);
-  --fundo: #f4f6f8;
+  --verde-principal: #2f9e41; /* Verde oficial IF */
+  --verde-hover: #247e33; /* Verde oficial mais escuro para hover */
+  --verde-claro: #ffffff; /* Fundo branco */
+  --verde-focus: rgba(47, 158, 65, 0.25);
+  --fundo: #ffffff; /* Fundo branco absoluto */
   --branco: #ffffff;
-  --texto-principal: #1c2a38;
-  --texto-secundario: #5c6b7d;
-  --borda: #d2dbd7;
-  --borda-suave: #e6ece9;
+  --texto-principal: #000000; /* Preto absoluto */
+  --texto-secundario: #000000; /* Preto absoluto */
+  --borda: #2f9e41; /* Bordas no verde oficial */
+  --borda-suave: rgba(47, 158, 65, 0.3); /* Bordas verdes semitransparentes */
   --vermelho-suave: #cd191e;
-  --vermelho-claro: #fdf2f2;
-  --sombra-card: 0 4px 12px rgba(0, 0, 0, 0.03), 0 8px 24px rgba(0, 0, 0, 0.05);
-  --sombra-botao: 0 4px 12px rgba(19, 88, 70, 0.15);
+  --vermelho-claro: #ffffff;
+  --sombra-card: 0 0 0 1px var(--borda); /* Borda limpa ao invés de sombra difusa */
+  --sombra-botao: none;
   --raio-card: 8px;
   --raio-input: 8px;
   --raio-botao: 8px;
@@ -79,7 +79,7 @@
 }
 
 .ifam-logo-divider {
-  stroke: #2f9e41;
+  stroke: var(--cor-verde-marca);
   stroke-width: 1.5;
 }
 
@@ -179,7 +179,7 @@
 .label-voce {
   font-weight: 600;
   margin-right: 6px;
-  color: #627282;
+  color: rgba(0, 0, 0, 0.65);
 }
 
 .crumb-link {
@@ -196,7 +196,7 @@
 
 .separator {
   margin: 0 8px;
-  color: #cbd5e1;
+  color: rgba(0, 0, 0, 0.25);
   font-weight: 400;
 }
 
@@ -324,14 +324,14 @@
   padding: 0 14px;
   border: 1px solid var(--borda);
   border-radius: var(--raio-input);
-  background: #fafbfc;
+  background: var(--branco);
   color: var(--texto-principal);
   font-size: 0.9rem;
   transition: border-color var(--transicao), box-shadow var(--transicao), background-color var(--transicao);
 }
 
 .agendamento-form input::placeholder {
-  color: #a0aec0;
+  color: rgba(0, 0, 0, 0.4);
 }
 
 .agendamento-form input:hover:not(:focus) {
@@ -451,7 +451,7 @@
   align-items: flex-end;
   gap: 16px;
   padding: 16px 24px;
-  background: #fafbfc;
+  background: var(--branco);
   border-bottom: 1px solid var(--borda-suave);
 }
 
@@ -550,7 +550,7 @@
 }
 
 .agendamento-list tbody tr:hover {
-  background: #f8faf9;
+  background: rgba(47, 158, 65, 0.05);
 }
 
 .agendamento-list td {
@@ -622,7 +622,7 @@
 
 /* --- RODAPÉ INSTITUCIONAL IFAM --- */
 .ifam-footer {
-  background: #18222d;
+  background: #000000;
   color: var(--branco);
   border-top: 4px solid var(--cor-verde-marca);
 }
@@ -648,14 +648,15 @@
 
 .ifam-footer-brand p {
   font-size: 0.84rem;
-  color: #a0aec0;
+  color: var(--branco);
   line-height: 1.5;
   margin: 0 0 8px;
 }
 
 .ifam-footer-brand .academic-purpose {
   font-size: 0.78rem;
-  color: #718096;
+  color: var(--branco);
+  opacity: 0.85;
   font-style: italic;
 }
 
@@ -672,7 +673,7 @@
 .ifam-footer-contacts p,
 .ifam-footer-info p {
   font-size: 0.84rem;
-  color: #a0aec0;
+  color: var(--branco);
   line-height: 1.5;
   margin: 0 0 10px;
 }
@@ -693,13 +694,13 @@
 }
 
 .links-rodape a:hover {
-  color: #5ed673;
+  color: var(--branco);
   text-decoration: underline;
 }
 
 .ifam-footer-bottom {
-  background: #111a22;
-  border-top: 1px solid #23303d;
+  background: #000000;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
   padding: 20px 40px;
   text-align: center;
 }
@@ -707,7 +708,8 @@
 .ifam-footer-bottom p {
   margin: 0;
   font-size: 0.76rem;
-  color: #718096;
+  color: var(--branco);
+  opacity: 0.75;
 }
 
 /* --- RESPONSIVIDADE --- */
@@ -793,11 +795,11 @@
 }
 
 .agendamento-stat-card.proxima::before {
-  background: #dd6b20;
+  background: var(--cor-verde-marca);
 }
 
 .agendamento-stat-card.distrib::before {
-  background: #3182ce;
+  background: var(--verde-principal);
 }
 
 .stat-icon {
@@ -852,16 +854,16 @@
 }
 
 .banca-badge.online {
-  background: #ebf8ff;
-  color: #2b6cb0;
-  border: 1px solid rgba(49, 130, 206, 0.2);
+  background: var(--verde-claro);
+  color: var(--verde-principal);
+  border: 1px solid rgba(19, 88, 70, 0.2);
 }
 
 .banca-badge.hoje {
-  background: #fffaf0;
-  color: #dd6b20;
-  border: 1px solid rgba(221, 107, 32, 0.2);
-  animation: pulse-orange 2s infinite ease-in-out;
+  background: var(--vermelho-claro);
+  color: var(--cor-vermelho-marca);
+  border: 1px solid rgba(205, 25, 30, 0.2);
+  animation: pulse-red 2s infinite ease-in-out;
 }
 
 .banca-badge.conflito {
@@ -870,7 +872,7 @@
   border: 1px solid rgba(205, 25, 30, 0.2);
 }
 
-@keyframes pulse-orange {
+@keyframes pulse-red {
   0% { opacity: 0.9; }
   50% { opacity: 1; transform: scale(1.02); }
   100% { opacity: 0.9; }
@@ -1083,8 +1085,8 @@
 }
 
 .quick-btn {
-  background: #f1f5f2;
-  border: 1px solid rgba(19, 88, 70, 0.1);
+  background: var(--branco);
+  border: 1px solid var(--cor-verde-marca);
   border-radius: 4px;
   padding: 4px 8px;
   font-size: 0.72rem;
@@ -1110,7 +1112,7 @@
   padding: 0 14px;
   border: 1px solid var(--borda);
   border-radius: var(--raio-input);
-  background: #fafbfc;
+  background: var(--branco);
   color: var(--texto-principal);
   font-size: 0.9rem;
   transition: border-color var(--transicao), box-shadow var(--transicao), background-color var(--transicao);
@@ -1130,7 +1132,7 @@
   align-items: center;
   gap: 6px;
   font-size: 0.78rem;
-  color: #dd6b20;
+  color: var(--cor-vermelho-marca);
   font-weight: 600;
   margin-top: 4px;
 }
@@ -1176,7 +1178,7 @@
   color: var(--texto-secundario);
   padding: 10px 24px;
   margin: 0;
-  background: #fafbfc;
+  background: var(--branco);
   border-bottom: 1px solid var(--borda-suave);
 }
 
@@ -1231,12 +1233,12 @@
 .skeleton-cell {
   height: 20px;
   width: 100%;
-  background: #f0f3f1;
+  background: rgba(47, 158, 65, 0.05);
   background-image: linear-gradient(
     90deg,
-    #f0f3f1 0px,
-    #e2e8e4 40px,
-    #f0f3f1 80px
+    rgba(47, 158, 65, 0.05) 0px,
+    rgba(47, 158, 65, 0.15) 40px,
+    rgba(47, 158, 65, 0.05) 80px
   );
   background-size: 600px 100%;
   background-repeat: no-repeat;
@@ -1253,11 +1255,11 @@
 }
 
 .agendamento-stat-card.proxima .stat-svg-icon {
-  color: #dd6b20;
+  color: var(--cor-verde-marca);
 }
 
 .agendamento-stat-card.distrib .stat-svg-icon {
-  color: #3182ce;
+  color: var(--verde-principal);
 }
 
 .toast-svg-icon {
@@ -1290,4 +1292,75 @@
   border-radius: 50%;
   background-color: currentColor;
   margin-right: 2px;
+}
+
+/* --- ESTILOS DO CALENDÁRIO MENSUAL --- */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background: var(--borda-suave);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-card);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.calendar-header-day {
+  background: var(--branco);
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.76rem;
+  padding: 10px 0;
+  color: var(--texto-principal);
+  border-bottom: 2px solid var(--cor-verde-marca);
+  text-transform: uppercase;
+}
+
+.calendar-day-cell {
+  background: var(--branco);
+  min-height: 85px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: background-color var(--transicao), border-color var(--transicao);
+  box-sizing: border-box;
+}
+
+.calendar-day-cell:hover:not(.other-month) {
+  background: rgba(47, 158, 65, 0.05);
+}
+
+.calendar-day-cell.other-month {
+  background: rgba(0, 0, 0, 0.02);
+  color: rgba(0, 0, 0, 0.25);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.calendar-day-cell.selected {
+  background: rgba(47, 158, 65, 0.08);
+  border: 2px solid var(--cor-verde-marca);
+  padding: 6px;
+}
+
+.calendar-day-cell.today {
+  border: 2px solid var(--cor-vermelho-marca);
+  padding: 6px;
+}
+
+.calendar-day-number {
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: var(--texto-principal);
+}
+
+.calendar-day-cell.other-month .calendar-day-number {
+  color: rgba(0, 0, 0, 0.25);
+}
+
+.calendar-day-cell.today .calendar-day-number {
+  color: var(--cor-vermelho-marca);
 }
